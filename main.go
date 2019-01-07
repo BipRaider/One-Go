@@ -10,9 +10,9 @@ func habdlerFunc(w http.ResponseWriter, r *http.Request) { //Данную фун
 	w.Header().Set("Content-Type", "text/html")
 	if r.URL.Path == "/" {
 		fmt.Fprint(w, "<h1>Welcom to my as2 site!</h1>")
-		fmt.Fprint(w, "<a href=\"contact\">contact</a>")
+		fmt.Fprint(w, "<a href=\"contact\">Open contact</a>")
 	} else if r.URL.Path == "/contact" {
-		fmt.Fprint(w, "get <a href=\"thebipus@gmail.com\">theBipus@gmail.com</a>")
+		fmt.Fprint(w, "<a href=\"thebipus@gmail.com\">theBipus@gmail.com</a>")
 	}
 
 }
