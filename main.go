@@ -6,9 +6,15 @@ import (
 )
 
 func habdlerFunc(w http.ResponseWriter, r *http.Request) { //Данную функцию можно назвать как угодно
-	print("Сhac brauzer ") // log_color_app:     bold_white    при дабовление это в runner.conf   пичает в терменале какждый раз как обновит в браузере страницу
+	// print("Сhac brauzer ") // log_color_app:     bold_white    при дабовление это в runner.conf   пичает в терменале какждый раз как обновит в браузере страницу
 	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprint(w, "<h1>Welcom to my as2 site!</h1>")
+	if r.URL.Path == "/" {
+		fmt.Fprint(w, "<h1>Welcom to my as2 site!</h1>")
+		fmt.Fprint(w, "<a href=\"contact\">contact</a>")
+	} else if r.URL.Path == "/contact" {
+		fmt.Fprint(w, "get <a href=\"thebipus@gmail.com\">theBipus@gmail.com</a>")
+	}
+
 }
 
 func main() {
