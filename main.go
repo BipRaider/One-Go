@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"./views"
+
 	"github.com/gorilla/mux"
 )
 
@@ -15,7 +17,7 @@ var (
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
-	print("New 1")
+
 	w.Header().Set("Content-Type", "text/html")
 	if err := homeTeplate.Execute(w, nil); err != nil {
 		os.Exit(1)
@@ -25,7 +27,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func contact(w http.ResponseWriter, r *http.Request) {
-	print("New 2")
+
 	w.Header().Set("Content-Type", "text/html")
 	if err := conatctTeplate.Execute(w, nil); err != nil {
 		os.Exit(4)
@@ -40,24 +42,33 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "<h1> NotFoud file</h1>")
 }
 func main() {
+	homeView = views.NewView("views/home.gohtml", "views/home_banner.gohtml")
 
 	var err error
-	homeTeplate, err = template.ParseFiles("views/home.gohtml")
+	homeTeplate, err = template.ParseFiles(
+		"views/home.gohtml",
+		"views/footer/footer.gohtml",
+	)
 	if err != nil {
 		os.Exit(2)
 		panic(err)
 	}
 
-	conatctTeplate, err = template.ParseFiles("views/contact.gohtml")
+	conatctTeplate, err = template.ParseFiles(
+		"views/contact.gohtml",
+		"views/footer/footer.gohtml",
+	)
 	if err != nil {
 		os.Exit(3)
 		panic(err)
 	}
 
-	r := mux.NewRouter()                           //https://www.gorillatoolkit.org/pkg/mux
+	r := mux.NewRouter() //https://www.gorillatoolkit.org/pkg/mux
+
 	r.NotFoundHandler = http.HandlerFunc(notFound) //Заменили вид выводящейся ошибки на своё -----1.4
+
 	r.HandleFunc("/", home)
-	r.HandleFunc("/contact/", contact)
+	r.HandleFunc("/contact", contact)
 
 	http.ListenAndServe(":3000", r) // это адрес сервера  куда будет отправляться данные
 }
