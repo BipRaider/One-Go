@@ -1,3 +1,39 @@
 <h1>Hello ,{{.Name}}</h1>
-<h2>Age ,{{.Age}}</h2>
-<a href=>{{.ANme}}</a>    
+
+<h1>Hello ,{{.Dof.Name1}}</h1>
+ <h1>Hello ,{{.Dof}}</h1>
+
+ {{range .Slise}}   <!-- Запускает переборку среза -->
+    <b> Slise item!</b>
+    {{.}}    <!-- Выдосит даные что в срезе -->
+ {{end}}    <!-- определяет когда заканчиваеться срез -->
+<p>
+  Age {{.Age}}
+</p>
+<p>
+  Float {{.Float}}
+</p>
+<p>
+  Slise {{.Slise}}
+</p>
+<p>
+  Map {{.Map}}
+</p>
+<pre>
+{{.Map}}
+</pre>
+
+<script>
+var m = {{.Map}};
+</script>
+
+{{if .Slise1}}   <!-- Если значение True выводится это-->
+<p>
+  Slise {{.Slise}}
+</p>
+     {{else }}  <!-- Если значение .Slise1 false выводится это-->
+      <p>
+       Slise {{.Map}}
+      </p>
+
+{{end}}
