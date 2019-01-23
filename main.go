@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 
@@ -13,6 +12,7 @@ var (
 	homeView    *views.View
 	conatctView *views.View
 )
+var NotF *views.NotView
 
 func home(w http.ResponseWriter, r *http.Request) {
 
@@ -40,12 +40,18 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprint(w, "<h1> NotFoud file</h1>")
+	err := NotF.Template.ExecuteTemplate(w, NotF.Layout, nil)
+
+	if err != nil {
+		os.Exit(1)
+
+	}
+
 }
 func main() {
 	homeView = views.NewView("bootstrap", "views/home.gohtml")
 	conatctView = views.NewView("bootstrap", "views/contact.gohtml")
-
+	NotF = views.NotFound()
 	r := mux.NewRouter() //https://www.gorillatoolkit.org/pkg/mux
 
 	r.NotFoundHandler = http.HandlerFunc(notFound) //Заменили вид выводящейся ошибки на своё -----1.4
