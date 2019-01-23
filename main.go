@@ -17,10 +17,10 @@ var (
 func home(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
-	err := homeView.Template.Execute(w, nil)
+	err := homeView.Template.ExecuteTemplate(w, homeView.Layout, nil)
+
 	if err != nil {
 		os.Exit(1)
-		panic(err)
 
 	}
 }
@@ -28,10 +28,11 @@ func home(w http.ResponseWriter, r *http.Request) {
 func contact(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
-	err := conatctView.Template.Execute(w, nil)
+	err := conatctView.Template.ExecuteTemplate(w, conatctView.Layout, nil)
+
 	if err != nil {
-		os.Exit(4)
-		panic(err)
+		os.Exit(2)
+
 	}
 }
 
@@ -42,8 +43,8 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "<h1> NotFoud file</h1>")
 }
 func main() {
-	homeView = views.NewView("views/home.gohtml")
-	conatctView = views.NewView("views/contact.gohtml")
+	homeView = views.NewView("bootstrap", "views/home.gohtml")
+	conatctView = views.NewView("bootstrap", "views/contact.gohtml")
 
 	r := mux.NewRouter() //https://www.gorillatoolkit.org/pkg/mux
 
