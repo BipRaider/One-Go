@@ -46,8 +46,7 @@ func main() {
 	}
 	err = t.Execute(os.Stdout, data) // обрабатываем значения  переменой data  и по именам присваем им вид отображения (в файле hello.gohtml)
 	if err != nil {
-		panic(err)
-
+		os.Exit(77)
 	}
 
 }

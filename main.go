@@ -55,8 +55,11 @@ func main() {
 	r := mux.NewRouter() //https://www.gorillatoolkit.org/pkg/mux
 
 	r.NotFoundHandler = http.HandlerFunc(notFound) //Заменили вид выводящейся ошибки на своё -----1.4
-	r.HandleFunc("/", home)
+	r.HandleFunc("/home", home)
 	r.HandleFunc("/contact", contact)
 
 	http.ListenAndServe(":3000", r) // это адрес сервера  куда будет отправляться данные
 }
+
+//http://localhost:3000/
+//https://getbootstrap.com/docs/3.3/components/#nav
