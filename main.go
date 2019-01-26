@@ -11,49 +11,39 @@ import (
 var (
 	homeView    *views.View
 	conatctView *views.View
+	NotF        *views.View
 )
-var NotF *views.NotView
 
 func home(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
-	err := homeView.Template.ExecuteTemplate(w, homeView.Layout, nil)
 
-	if err != nil {
-		os.Exit(1)
+	must(homeView.Render(w, nil), 1)
 
-	}
 }
 
 func contact(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
-	err := conatctView.Template.ExecuteTemplate(w, conatctView.Layout, nil)
 
-	if err != nil {
-		os.Exit(2)
+	must(conatctView.Render(w, nil), 2)
 
-	}
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusNotFound)
-	err := NotF.Template.ExecuteTemplate(w, NotF.Layout, nil)
-
-	if err != nil {
-		os.Exit(1)
-
-	}
+	must(NotF.Render(w, nil), 3)
 
 }
 func main() {
 	homeView = views.NewView("bootstrap", "views/home.gohtml")
 	conatctView = views.NewView("bootstrap", "views/contact.gohtml")
-	NotF = views.NotFound()
+
 	r := mux.NewRouter() //https://www.gorillatoolkit.org/pkg/mux
 
+	NotF = views.NotFound()
 	r.NotFoundHandler = http.HandlerFunc(notFound) //Заменили вид выводящейся ошибки на своё -----1.4
 	r.HandleFunc("/home", home)
 	r.HandleFunc("/contact", contact)
@@ -63,3 +53,11 @@ func main() {
 
 //http://localhost:3000/
 //https://getbootstrap.com/docs/3.3/components/#nav
+
+//Функция вывода ошибоки
+func must(err error, n int) {
+	if err != nil {
+		os.Exit(n)
+	}
+
+}
