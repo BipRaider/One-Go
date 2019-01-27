@@ -19,6 +19,7 @@ func NewView(layout string, files ...string) *View {
 	t, err := template.ParseFiles(files...) // Записываем в переменую t значаения(срез  файлов ) с  файла по сылке
 
 	if err != nil {
+
 		os.Exit(5)
 	}
 	return &View{
