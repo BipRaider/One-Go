@@ -20,14 +20,18 @@ type Users struct {
 
 //This is used to render the form where  can create
 //a new user account.
+//Это используется для визуализации формы, где можно создать
+// новая учетная запись пользователя
 // GET /signup
 func (u *Users) New(w http.ResponseWriter, r *http.Request) {
 
 	u.NewView.Render(w, nil)
 }
 
-//This is used to process the signup form when a user tries to
+//This is used to process the sign up form when a user tries to
 //create a new user account.
+// Используется для обработки формы регистрации, когда пользователь пытается
+// создать новую учетную запись пользователя.
 //
 //POST /signup
 func (u *Users) Create(w http.ResponseWriter, r *http.Request) {

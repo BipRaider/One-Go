@@ -38,15 +38,15 @@ func main() {
 
 	usersC := controllers.NewUser()
 
-	r := mux.NewRouter() //https://www.gorillatoolkit.org/pkg/mux
-
+	//https://www.gorillatoolkit.org/pkg/mux
+	r := mux.NewRouter()
 	NotF = views.NotFound()
-	r.NotFoundHandler = http.HandlerFunc(notFound) //Заменили вид выводящейся ошибки на своё -----1.4
+	r.NotFoundHandler = http.HandlerFunc(notFound) //Заменили вид выводящейся ошибки на своё
 
 	r.HandleFunc("/home", home).Methods("GET")
 	r.HandleFunc("/contact", contact).Methods("GET")
 	r.HandleFunc("/signup", usersC.New).Methods("GET")
-	r.HandleFunc("/signup", usersC.Create).Methods("POST")
+	r.HandleFunc("/signup", usersC.Create).Methods("POST") //Выводит сообщение от функций Create
 
 	http.ListenAndServe(":3000", r) // это адрес сервера  куда будет отправляться данные
 }
