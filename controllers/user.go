@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"../views"
 )
@@ -25,7 +26,9 @@ type Users struct {
 // GET /signup
 func (u *Users) New(w http.ResponseWriter, r *http.Request) {
 
-	u.NewView.Render(w, nil)
+	if err := u.NewView.Render(w, nil); err != nil {
+		os.Exit(9)
+	}
 }
 
 //This is used to process the sign up form when a user tries to
@@ -35,7 +38,16 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request) {
 //
 //POST /signup
 func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "This is a fake message.Pretend that we created the user account")
+	if err := r.ParseForm(); err != nil { //----1.1----
+		os.Exit(8)
+	}
+	//r.PostForm = map[string][]string
+	fmt.Fprintln(w, r.PostForm["emeil"]) // выводит срез записи  после в вода даных в sign up
+	// fmt.Fprintln(w, r.PostFormValue("emeil")) // выводит первую запись после в вода даных в sign up
+	fmt.Fprintln(w, r.PostForm["password"])
+	// fmt.Fprintln(w, r.PostFormValue("password"))
+
 }
 
 //https://github.com/gorilla/mux
+//https://golang.org/pkg/net/http/#pkg-examples -----1.1-----
