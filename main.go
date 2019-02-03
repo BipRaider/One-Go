@@ -33,22 +33,24 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 
 }
 func main() {
-	homeView = views.NewView("bootstrap", "views/home.gohtml")
-	conatctView = views.NewView("bootstrap", "views/contact.gohtml")
+	r := mux.NewRouter() //1 begin
 
-	usersC := controllers.NewUser()
+	homeView = views.NewView("bootstrap", "views/home.gohtml")       //2
+	conatctView = views.NewView("bootstrap", "views/contact.gohtml") //2
+
+	usersC := controllers.NewUser() //2
 
 	//https://www.gorillatoolkit.org/pkg/mux
-	r := mux.NewRouter()
-	NotF = views.NotFound()
-	r.NotFoundHandler = http.HandlerFunc(notFound) //Заменили вид выводящейся ошибки на своё
 
-	r.HandleFunc("/home", home).Methods("GET")
-	r.HandleFunc("/contact", contact).Methods("GET")
-	r.HandleFunc("/signup", usersC.New).Methods("GET")
-	r.HandleFunc("/signup", usersC.Create).Methods("POST") //Выводит сообщение от функций Create
+	NotF = views.NotFound()                        //2
+	r.NotFoundHandler = http.HandlerFunc(notFound) //3 //Заменили вид выводящейся ошибки на своё
 
-	http.ListenAndServe(":3000", r) // это адрес сервера  куда будет отправляться данные
+	r.HandleFunc("/home", home).Methods("GET")             //3
+	r.HandleFunc("/contact", contact).Methods("GET")       //3
+	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
+	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
+
+	http.ListenAndServe(":3000", r) //end// это адрес сервера  куда будет отправляться данные
 }
 
 //http://localhost:3000/
