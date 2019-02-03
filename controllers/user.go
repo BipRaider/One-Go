@@ -1,13 +1,11 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
 
 	"../views"
-	"github.com/gorilla/schema"
 )
 
 func NewUser() *Users {
@@ -62,23 +60,33 @@ type SignupForm struct {
 //POST /signup
 
 func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обрабатывает в водимые данные в браузере
-	if err := r.ParseForm(); err != nil { //----1.1----
-		err = errors.New("ERROR func user/Create at ParseForm")
-		os.Exit(8)
+	//----1.3---
+	var form SignupForm
+	if err := parseForm(r, &form); err != nil {
+		os.Exit(82)
 	}
+	fmt.Fprintln(w, form)
+
+	//-----1.1---1.2---
+	// if err := r.ParseForm(); err != nil { //----1.1----
+	// 	err = errors.New("ERROR func user/Create at ParseForm")
+	// 	os.Exit(8)
+	// }
+	//----1.1---
 	//r.PostForm = map[string][]string
 	// fmt.Fprintln(w, r.PostForm["emeil"]) // выводит срез записи  после в вода даных в sign up
 	// fmt.Fprintln(w, r.PostFormValue("emeil")) // выводит первую запись после в вода даных в sign up
 	// fmt.Fprintln(w, r.PostForm["password"])
 	// fmt.Fprintln(w, r.PostFormValue("password"))
-	dec := schema.NewDecoder()
-	form := SignupForm{}
-	if err := dec.Decode(&form, r.PostForm); err != nil {
+	//----1.2----
+	// dec := schema.NewDecoder()
+	// form := SignupForm{}
+	// if err := dec.Decode(&form, r.PostForm); err != nil {
 
-		err = errors.New("ERROR func user/Create at Decode")
-		os.Exit(81)
-	}
-	fmt.Fprintln(w, form)
+	// 	err = errors.New("ERROR func user/Create at Decode")
+	// 	os.Exit(81)
+	// }
+	// fmt.Fprintln(w, form)
 
 }
 
