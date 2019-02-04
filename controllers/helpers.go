@@ -6,8 +6,9 @@ import (
 	"github.com/gorilla/schema"
 )
 
+// функция  обработки в водимых данных в форме регестраций
 func parseForm(r *http.Request, dst interface{}) error {
-	if err := r.ParseForm(); err != nil { //----1.1----
+	if err := r.ParseForm(); err != nil {
 		return err
 	}
 	dec := schema.NewDecoder()

@@ -35,9 +35,9 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter() //1 begin
 
-	homeView = views.NewView("bootstrap", "views/home.gohtml")       //2
-	conatctView = views.NewView("bootstrap", "views/contact.gohtml") //2
-
+	// homeView = views.NewView("bootstrap", "views/home.gohtml")       //2
+	// conatctView = views.NewView("bootstrap", "views/contact.gohtml") //2
+	staticC := controllers.NewStatic()
 	usersC := controllers.NewUser() //2
 
 	//https://www.gorillatoolkit.org/pkg/mux
@@ -45,8 +45,8 @@ func main() {
 	NotF = views.NotFound()                        //2
 	r.NotFoundHandler = http.HandlerFunc(notFound) //3 //Заменили вид выводящейся ошибки на своё
 
-	r.HandleFunc("/home", home).Methods("GET")             //3
-	r.HandleFunc("/contact", contact).Methods("GET")       //3
+	r.Handle("/home", staticC.Home).Methods("GET")         //3
+	r.Handle("/contact", staticC.Contact).Methods("GET")   //3
 	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
 
