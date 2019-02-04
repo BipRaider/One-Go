@@ -45,14 +45,18 @@ func layoutFiles() []string {
 	return files
 }
 
-// Функция для которая выводит в браузер нужную файл и какого шаблона , 1.2
+// Функция  которая выводит в браузер нужную файл и какого шаблона , 1.2
 func (v *View) Render(w http.ResponseWriter, data interface{}) error {
+	w.Header().Set("Content-Type", "text/html")
 	return v.Template.ExecuteTemplate(w, v.Layout, data)
 
 }
+
+//Функция  которая выводит в браузер нужную файл и какого шаблона , 1.2.1
 func (v *View) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
 	if err := v.Render(w, nil); err != nil {
-		panic(err)
+		os.Exit(12)
 	}
 }
 
