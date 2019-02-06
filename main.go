@@ -40,7 +40,7 @@ func main() {
 	// conatctView = views.NewView("bootstrap", "views/contact.gohtml") //2
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUser() //2
-	faqC := controllers.NewFAQ()
+	// faqC := controllers.NewFAQ()
 
 	//https://www.gorillatoolkit.org/pkg/mux
 
@@ -49,8 +49,8 @@ func main() {
 
 	r.Handle("/home", staticC.Home).Methods("GET")       //3
 	r.Handle("/contact", staticC.Contact).Methods("GET") //3
-	r.HandleFunc("/faq", faqC.NewFaqGet).Methods("GET")
-	r.HandleFunc("/faq", faqC.NewFaqCreate).Methods("POST")
+	r.HandleFunc("/faq", usersC.NewFaqGet).Methods("GET")
+	r.HandleFunc("/faq", usersC.Create).Methods("POST")
 	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
 

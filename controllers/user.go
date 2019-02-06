@@ -11,12 +11,13 @@ import (
 func NewUser() *Users {
 	return &Users{
 		NewView: views.NewView("bootstrap", "users/new"),
+		NewFaq:  views.NewView("bootstrap", "static/faq"),
 	}
-
 }
 
 type Users struct {
 	NewView *views.View
+	NewFaq  *views.View
 }
 
 //GET Reading a resource ПОЛУЧИТЬ Чтение ресурса
@@ -41,8 +42,15 @@ type Users struct {
 // новая учетная запись пользователя
 // GET /signup
 func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабатывает Html шаблоны и вывоодит в браузер .
-
 	if err := u.NewView.Render(w, nil); err != nil {
+		os.Exit(9)
+	}
+
+}
+
+// GET /signup
+func (u *Users) NewFaqGet(w http.ResponseWriter, r *http.Request) {
+	if err := u.NewFaq.Render(w, nil); err != nil {
 		os.Exit(9)
 	}
 }
@@ -50,6 +58,7 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабаты
 type SignupForm struct {
 	Email    string `schema:"emeil"`
 	Password string `schema:"password"`
+	Quastion string `schema:"faq"`
 }
 
 //This is used to process the sign up form when a user tries to
