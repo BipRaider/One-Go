@@ -10,19 +10,17 @@ import (
 
 func NewFAQ() *FAQUsers {
 	return &FAQUsers{
-		NewView: views.NewView("bootstrap", "users/new"),
+		NewFaq: views.NewView("bootstrap", "static/faq"),
 	}
-
 }
 
 type FAQUsers struct {
-	NewView *views.View
+	NewFaq *views.View
 }
 
 // GET /signup
-func (u *FAQUsers) New(w http.ResponseWriter, r *http.Request) {
-
-	if err := u.NewView.Render(w, nil); err != nil {
+func (u *FAQUsers) NewFaqGet(w http.ResponseWriter, r *http.Request) {
+	if err := u.NewFaq.Render(w, nil); err != nil {
 		os.Exit(9)
 	}
 }
@@ -32,13 +30,11 @@ type SignupFormFaq struct {
 }
 
 //POST /signup
-
-func (u *FAQUsers) Create(w http.ResponseWriter, r *http.Request) {
+func (u *FAQUsers) NewFaqCreate(w http.ResponseWriter, r *http.Request) {
 
 	var form SignupFormFaq
 	if err := parseForm(r, &form); err != nil {
 		os.Exit(82)
 	}
 	fmt.Fprintln(w, form)
-
 }

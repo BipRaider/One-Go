@@ -49,8 +49,8 @@ func main() {
 
 	r.Handle("/home", staticC.Home).Methods("GET")       //3
 	r.Handle("/contact", staticC.Contact).Methods("GET") //3
-	r.HandleFunc("/faq", faqC.FAQ).Methods("GET")
-	// r.HandleFunc("/faq", faqC.FAQ).Methods("POST")
+	r.HandleFunc("/faq", faqC.NewFaqGet).Methods("GET")
+	r.HandleFunc("/faq", faqC.NewFaqCreate).Methods("POST")
 	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
 
