@@ -90,6 +90,9 @@ func main() {
 	// }
 
 	defer db.Close()
+	// if err := db.DB().Ping(); err != nil {
+	// 	os.Exit(133)
+	// }
 	http.HandleFunc("/", IndexHandler)
 	http.HandleFunc("/create", CreateHandler)
 
