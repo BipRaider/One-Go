@@ -67,3 +67,5 @@ func must(err error, n int) {
 	}
 
 }
+
+//https://dev.mysql.com/doc/workbench/en/wb-mysql-connections-navigator-management-users-and-privileges.html

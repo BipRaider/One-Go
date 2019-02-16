@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>List Name</title>
+    </head>
+    <body>
+        <table>
+            <thead><th>Id</th><th>Возраст</th><th>Имя</th><th>Фамилия</th><th>Email adres</th></thead>
+            {{range . }}
+            <tr>
+                <td>{{.Id}}</td>
+                <td>{{.Age}}</td>
+                <td>{{.FirstName}}</td>
+                <td>{{.LastName}}</td>
+                <td>{{.Email}}</td>
+            </tr>
+            {{end}}
+
+        </table>
+        <li><a href="/create">создать</a></li>
+    </body>
+</html>
