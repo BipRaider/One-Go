@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql" // подсоединить библиотеку mysql
@@ -10,8 +13,23 @@ import (
 
 type UserGorm struct {
 	gorm.Model
-	LastName string
-	Email    string `gorm:"not null;unique_index"`
+	Name  string
+	Email string `gorm:"not null;unique_index"`
+	Color string
+}
+
+func getInfp() (name, email, color string) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("What id your name?")
+	name, _ = reader.ReadString('\n')
+	fmt.Println("Whatewr idewr yourer nameqweqwe?")
+	email, _ = reader.ReadString('\n')
+	fmt.Println("Whatewr color?")
+	color, _ = reader.ReadString('\n')
+	name = strings.TrimSpace(color)
+	name = strings.TrimSpace(name)
+	email = strings.TrimSpace(email)
+	return name, email, color
 }
 
 func main() {
@@ -28,18 +46,14 @@ func main() {
 	}
 	db.LogMode(true)
 	db.AutoMigrate(&UserGorm{}) // автомотически отправляет данные в базу даных
-
-	// // Create
-	// db.Create(&Product{Code: "L1212", Price: 1000})
-
-	// // Read
-	// var product Product
-	// db.First(&product, 1)                   // find product with id 1
-	// db.First(&product, "code = ?", "L1212") // find product with code l1212
-
-	// // Update - update product's price to 2000
-	// db.Model(&product).Update("Price", 2000)
-
-	// // Delete - delete product
-	// db.Delete(&product)
+	name, email, color := getInfp()
+	u := UserGorm{
+		Name:  name,
+		Email: email,
+		Color: color,
+	}
+	if err = db.Create(&u).Error; err != nil {
+		os.Exit(1)
+	}
+	fmt.Printf("%+v\n", u)
 }
