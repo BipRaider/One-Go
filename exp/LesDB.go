@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql" // подсоединить библиотеку mysql
@@ -40,6 +42,28 @@ func main() {
 			os.Exit(33)
 		}
 	}
+	name, email, color := getInfp()
+	u := UserGorm{
+		Name:  name,
+		Email: email,
+		Color: color,
+	}
+	if err = db.Create(&u).Error; err != nil {
+		os.Exit(1)
+	}
 	fmt.Println(u)
 
+}
+func getInfp() (name, email, color string) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("What id your name?")
+	name, _ = reader.ReadString('\n')
+	fmt.Println("Whatewr idewr yourer nameqweqwe?")
+	email, _ = reader.ReadString('\n')
+	fmt.Println("Whatewr color?")
+	color, _ = reader.ReadString('\n')
+	name = strings.TrimSpace(color)
+	name = strings.TrimSpace(name)
+	email = strings.TrimSpace(email)
+	return name, email, color
 }
