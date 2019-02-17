@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"log"
 	"os"
-	"strings"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql" // подсоединить библиотеку mysql
@@ -18,42 +15,31 @@ type UserGorm struct {
 	Color string
 }
 
-func getInfp() (name, email, color string) {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("What id your name?")
-	name, _ = reader.ReadString('\n')
-	fmt.Println("Whatewr idewr yourer nameqweqwe?")
-	email, _ = reader.ReadString('\n')
-	fmt.Println("Whatewr color?")
-	color, _ = reader.ReadString('\n')
-	name = strings.TrimSpace(color)
-	name = strings.TrimSpace(name)
-	email = strings.TrimSpace(email)
-	return name, email, color
-}
-
 func main() {
-	db, err := gorm.Open("mysql", "root:alfadog1@/bipusdb") //Соединение с базой данных
-
+	db, err := gorm.Open("mysql", "root:alfadog1@/bipusdb?parseTime=true") //Соединение с базой данных  !!ВАЖНО ?parseTime=true  добисывать в конце если надо чтобы выводило время
 	if err != nil {
-		log.Println(err)
+		panic(err)
 	}
-
 	defer db.Close()
 
-	if err := db.DB().Ping(); err != nil {
-		os.Exit(133)
-	}
 	db.LogMode(true)
 	db.AutoMigrate(&UserGorm{}) // автомотически отправляет данные в базу даных
-	name, email, color := getInfp()
-	u := UserGorm{
-		Name:  name,
-		Email: email,
-		Color: color,
+
+	var u UserGorm
+	// newDB := db.Where("email=?", "blah@blah.com")
+	// newDB = newDB.Or("color=?", "wite")
+	// newDB = newDB.First(&u)
+	db = db.Where("email = ?", "bipus@gma1il.com").First(&u)
+	if err := db.Where("email = ?", "bipus1@gmail.com").First(&u).Error; err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			fmt.Println("1111100011111")
+		case gorm.ErrInvalidSQL:
+			fmt.Println("sql")
+		default:
+			os.Exit(33)
+		}
 	}
-	if err = db.Create(&u).Error; err != nil {
-		os.Exit(1)
-	}
-	fmt.Printf("%+v\n", u)
+	fmt.Println(u)
+
 }
