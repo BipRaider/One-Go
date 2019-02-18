@@ -13,7 +13,7 @@ import (
 type UserGorm struct {
 	gorm.Model
 	Name  string
-	Email string `gorm:"not null;unique_index"`
+	Email string `gorm:"not null;unique_index"` // добовления типа данных в базуданых
 	Color string
 }
 
@@ -24,15 +24,27 @@ func main() {
 	}
 	defer db.Close()
 
-	db.LogMode(true)
+	//db.LogMode(true)            // отображает лог строки запроса в терменале
 	db.AutoMigrate(&UserGorm{}) // автомотически отправляет данные в базу даных
 
 	var u UserGorm
+	name, email, color := getInfp()
+	us := UserGorm{
+		Name:  name,
+		Email: email,
+		Color: color,
+	}
+	if err = db.Create(&us).Error; err != nil { // ЗАписывет данные в базу-данных
+		os.Exit(1)
+	} else {
+		db.Last(&us)
+		fmt.Println("Last name created in datanase \n", us)
+	}
 	// newDB := db.Where("email=?", "blah@blah.com")
-	// newDB = newDB.Or("color=?", "wite")
+	// newDB = newDB.Or("color=?", "wite")             // функция или
 	// newDB = newDB.First(&u)
-	db = db.Where("email = ?", "bipus@gma1il.com").First(&u)
-	if err := db.Where("email = ?", "bipus1@gmail.com").First(&u).Error; err != nil {
+	// db = db.Where("email = ?", "bipus@gmail.com").First(&u)
+	if err := db.Where("email = ?", "bipus@gmail.com").First(&u).Error; err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
 			fmt.Println("1111100011111")
@@ -42,27 +54,19 @@ func main() {
 			os.Exit(33)
 		}
 	}
-	name, email, color := getInfp()
-	u := UserGorm{
-		Name:  name,
-		Email: email,
-		Color: color,
-	}
-	if err = db.Create(&u).Error; err != nil {
-		os.Exit(1)
-	}
+
 	fmt.Println(u)
 
 }
 func getInfp() (name, email, color string) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("What id your name?")
-	name, _ = reader.ReadString('\n')
+	name, _ = reader.ReadString('\n') // Функция для запроса в вода fmt.Scan
 	fmt.Println("Whatewr idewr yourer nameqweqwe?")
 	email, _ = reader.ReadString('\n')
 	fmt.Println("Whatewr color?")
 	color, _ = reader.ReadString('\n')
-	name = strings.TrimSpace(color)
+	name = strings.TrimSpace(color) // Возвращает срез строки  без ( \n )
 	name = strings.TrimSpace(name)
 	email = strings.TrimSpace(email)
 	return name, email, color
