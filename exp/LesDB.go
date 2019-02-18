@@ -28,7 +28,7 @@ func main() {
 	db.AutoMigrate(&UserGorm{}) // автомотически отправляет данные в базу даных
 
 	var u UserGorm
-	name, email, color := getInfp()
+	name, email, color := getInfp() // выводит данные для дальнейшей записи
 	us := UserGorm{
 		Name:  name,
 		Email: email,
@@ -58,6 +58,8 @@ func main() {
 	fmt.Println(u)
 
 }
+
+// запрос нужных данных для записи в базу данных
 func getInfp() (name, email, color string) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("What id your name?")
