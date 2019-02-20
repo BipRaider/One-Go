@@ -49,6 +49,13 @@ func (us *UserService) ByID(id uint) (*User, error) {
 	}
 }
 
+//Create will create the provided user and backfill data
+// like the ID, CreatedAt and UpdateAt fileds.
+func (us *UserService) Create(user *User) error {
+
+	return us.db.Create(user).Error
+}
+
 //Фнкция для closes the Service with database
 func (us *UserService) Close() error {
 	return us.db.Close()
