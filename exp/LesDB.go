@@ -26,27 +26,30 @@ const (
 // 	Amount      int    //количество
 // 	Description string // описание
 // }
-
 func main() {
 	us, err := models.NewUserService(mysqlinfo)
 	if err != nil {
 		panic(err)
 	}
 	defer us.Close()
-	// us.DestructiveReset()
-	// user := models.User{
-	// 	Name:  "Micheal Scott",
-	// 	Email: "Micheal@gmail.com",
-	// }
-	// if err := us.Create(&user); err != nil {
-	// 	os.Exit(2)
-	// }
-	user, err := us.ByID(1)
+	us.DestructiveReset()
+	user := models.User{
+		Name:  "Micheal Scott",
+		Email: "Micheal@gmail.com",
+	}
+	if err := us.Create(&user); err != nil {
+		os.Exit(2)
+	}
+	if err := us.Delete(user.ID); err != nil {
+		os.Exit(3)
+
+	}
+	userByID, err := us.ByID(user.ID)
 	if err != nil {
-		os.Exit(1)
+		panic(err)
 	}
 
-	fmt.Println(user)
+	fmt.Println(userByID)
 
 	// db, err := gorm.Open("mysql", mysqlinfo) //Соединение с базой данных  !!ВАЖНО ?parseTime=true  добисывать в конце если надо чтобы выводило время
 	// if err != nil {
