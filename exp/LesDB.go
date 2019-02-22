@@ -35,12 +35,12 @@ func main() {
 	us.DestructiveReset()
 	user := models.User{
 		Name:  "Micheal Scott",
-		Email: "Micheal@gmail.com",
+		Email: "M31l@gmail.com",
 	}
 	if err := us.Create(&user); err != nil {
 		os.Exit(2)
 	}
-	if err := us.Delete(user.ID); err != nil {
+	if err = us.Delete(&user.ID); err != nil {
 		os.Exit(3)
 
 	}

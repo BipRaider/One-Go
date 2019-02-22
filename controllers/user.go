@@ -5,19 +5,22 @@ import (
 	"net/http"
 	"os"
 
+	"../models"
 	"../views"
 )
 
-func NewUser() *Users {
+func NewUser(us *models.UserService) *Users {
 	return &Users{
 		NewView: views.NewView("bootstrap", "users/new"),
 		NewFaq:  views.NewView("bootstrap", "static/faq"),
+		us:      us,
 	}
 }
 
 type Users struct {
 	NewView *views.View
 	NewFaq  *views.View
+	us      *models.UserService
 }
 
 //GET Reading a resource ПОЛУЧИТЬ Чтение ресурса
@@ -56,6 +59,7 @@ func (u *Users) NewFaqGet(w http.ResponseWriter, r *http.Request) {
 }
 
 type SignupForm struct {
+	Name     string `schema:"name"`
 	Email    string `schema:"emeil"`
 	Password string `schema:"password"`
 	Quastion string `schema:"faq"`
@@ -73,6 +77,15 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 	var form SignupForm
 	if err := parseForm(r, &form); err != nil {
 		os.Exit(82)
+	}
+	user := models.User{
+		Name:     form.Name,
+		Email:    form.Email,
+		Password: form.Password,
+	}
+	if err := u.us.Create(&user); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError) // выводит ошибку если в в базе данных есть такой ID
+		return
 	}
 	fmt.Fprintln(w, form)
 

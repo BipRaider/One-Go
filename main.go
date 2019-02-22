@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
 	"./controllers"
+	"./models"
 	"./views"
-
 	"github.com/gorilla/mux"
 )
 
@@ -33,13 +34,24 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 	must(NotF.Render(w, nil), 404)
 
 }
+
+const (
+	mysqlinfo = "root:alfadog1@/bipusdb?charset=utf8&parseTime=True&loc=Local"
+)
+
 func main() {
+	//соединение сайта с базойданых
+	us, err := models.NewUserService(mysqlinfo)
+	must(err, 3)
+	defer us.Close()
+	us.AutoMigrate()
+
 	r := mux.NewRouter() //1 begin
 
 	// homeView = views.NewView("bootstrap", "views/home.gohtml")       //2
 	// conatctView = views.NewView("bootstrap", "views/contact.gohtml") //2
 	staticC := controllers.NewStatic()
-	usersC := controllers.NewUser() //2
+	usersC := controllers.NewUser(us) //2
 	// faqC := controllers.NewFAQ()
 
 	//https://www.gorillatoolkit.org/pkg/mux
@@ -54,6 +66,7 @@ func main() {
 	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
 
+	fmt.Println("Starting the server on :3000...")
 	http.ListenAndServe(":3000", r) //end// это адрес сервера  куда будет отправляться данные
 }
 

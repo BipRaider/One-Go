@@ -73,7 +73,7 @@ func addTemlateExt(files []string) { //Добавит ".gohml"
 
 // Функция  которая выводит в браузер нужную файл и какого шаблона , 1.2
 func (v *View) Render(w http.ResponseWriter, data interface{}) error {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8") // надо указывать кодировку ;charset=utf-8
 	return v.Template.ExecuteTemplate(w, v.Layout, data)
 
 }

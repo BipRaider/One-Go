@@ -84,32 +84,47 @@ func (us *UserService) Create(user *User) error {
 
 //Update will update the provided user with all of the database
 //in the  provaided user object
-func (us *UserService) Update(user *User) error {
-	return us.db.Save(user).Error
-}
+func (us *UserService) Update(user *User) error { return us.db.Save(user).Error }
 
 //Delete will delete the user with the proveided ID
-func (us *UserService) Delete(id uint) error {
-	if id == 0 {
+func (us *UserService) Delete(id *uint) error {
+	if *id == 0 {
 		return ErrInvalidID
 	}
-	user := User{Model: gorm.Model{ID: id}}
+	user := User{
+		Model: gorm.Model{
+			ID: *id,
+		},
+	}
+
 	return us.db.Delete(&user).Error
 }
 
 //Фнкция для closes the Service with database
-func (us *UserService) Close() error {
-	return us.db.Close()
-}
+func (us *UserService) Close() error { return us.db.Close() }
 
 //DestructiveReset drops the user table and rebuilds it
-func (us *UserService) DestructiveReset() {
-	us.db.DropTableIfExists(&User{})
-	us.db.AutoMigrate(&User{})
+func (us *UserService) DestructiveReset() error {
+	if err := us.db.DropTableIfExists(&User{}).Error; err != nil {
+		return err
+	}
+	return us.AutoMigrate()
+
+}
+
+//AutoMigrate will attempt to autonatically migrate the
+//user table
+//Добовляет в базу данных нехватающих полей
+func (us *UserService) AutoMigrate() error {
+	if err := us.db.AutoMigrate(&User{}).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 type User struct {
 	gorm.Model
-	Name  string
-	Email string `gorm:"not null;unique_index"`
+	Name     string
+	Email    string `gorm:"not null;unique_index"`
+	Password string `gotm: "not null"`
 }
