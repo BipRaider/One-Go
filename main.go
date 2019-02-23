@@ -55,7 +55,7 @@ func main() {
 	// faqC := controllers.NewFAQ()
 
 	//https://www.gorillatoolkit.org/pkg/mux
-	Hashing
+
 	NotF = views.NotFound()                        //2
 	r.NotFoundHandler = http.HandlerFunc(notFound) //3 //Заменили вид выводящейся ошибки на своё
 

@@ -87,7 +87,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 		http.Error(w, err.Error(), http.StatusInternalServerError) // выводит ошибку если в в базе данных есть такой ID
 		return
 	}
-	fmt.Fprintln(w, form)
+	fmt.Fprintln(w, form, user)
 
 	//-----1.1---1.2---
 	// if err := r.ParseForm(); err != nil { //----1.1----
