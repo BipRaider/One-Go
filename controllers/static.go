@@ -6,8 +6,8 @@ import (
 
 func NewStatic() *Static {
 	return &Static{
-		Home:    views.NewView("bootstrap", "static/home"),
-		Contact: views.NewView("bootstrap", "static/contact"),
+		Home:    views.NewView(bs, "static/home"),
+		Contact: views.NewView(bs, "static/contact"),
 	}
 }
 

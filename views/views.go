@@ -20,7 +20,7 @@ func NewView(layout string, files ...string) *View {
 	t, err := template.ParseFiles(files...) // Записываем в переменую t значаения(срез  файлов ) с  файла по сылке
 
 	if err != nil {
-		os.Exit(5)
+		panic(err)
 	}
 	return &View{
 		Template: t, //Присваиваем шаблону   новый шаблон t  и возвращаем даные
@@ -40,7 +40,7 @@ func layoutFiles() []string { //Добовляем данные из файла
 
 	files, err := filepath.Glob(LayoutDir + "*" + TemplateExt)
 	if err != nil {
-		os.Exit(7)
+		panic(err)
 	}
 	return files
 }
@@ -75,26 +75,21 @@ func addTemlateExt(files []string) { //Добавит ".gohml"
 func (v *View) Render(w http.ResponseWriter, data interface{}) error {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8") // надо указывать кодировку ;charset=utf-8
 	return v.Template.ExecuteTemplate(w, v.Layout, data)
-
 }
 
 //Функция  которая выводит в браузер нужную файл и какого шаблона , 1.2.1
 func (v *View) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
 	if err := v.Render(w, nil); err != nil {
-		os.Exit(12)
+		panic(err)
 	}
 }
 
 //Template errors
 func NotFound() *View {
-
 	Name := "bootstrap"
-
 	files := []string{"views/nodfound.gohtml"}
 	files = append(files, layoutFiles()...)
 	t, err := template.ParseFiles(files...)
-
 	if err != nil {
 		os.Exit(6)
 	}

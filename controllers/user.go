@@ -9,18 +9,22 @@ import (
 	"../views"
 )
 
+const bs string = "bootstrap"
+
 func NewUser(us *models.UserService) *Users {
 	return &Users{
-		NewView: views.NewView("bootstrap", "users/new"),
-		NewFaq:  views.NewView("bootstrap", "static/faq"),
-		us:      us,
+		NewView:   views.NewView(bs, "users/new"),
+		NewFaq:    views.NewView(bs, "users/faq"),
+		LoginView: views.NewView(bs, "users/login"),
+		us:        us,
 	}
 }
 
 type Users struct {
-	NewView *views.View
-	NewFaq  *views.View
-	us      *models.UserService
+	NewView   *views.View
+	NewFaq    *views.View
+	LoginView *views.View
+	us        *models.UserService
 }
 
 //GET Reading a resource ПОЛУЧИТЬ Чтение ресурса
@@ -54,13 +58,13 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабаты
 // GET /signup
 func (u *Users) NewFaqGet(w http.ResponseWriter, r *http.Request) {
 	if err := u.NewFaq.Render(w, nil); err != nil {
-		os.Exit(9)
+		os.Exit(91)
 	}
 }
 
 type SignupForm struct {
 	Name     string `schema:"name"`
-	Email    string `schema:"emeil"`
+	Email    string `schema:"email"`
 	Password string `schema:"password"`
 	Quastion string `schema:"faq"`
 }
@@ -110,6 +114,22 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 	// }
 	// fmt.Fprintln(w, form)
 
+}
+
+type LoginForm struct {
+	Email    string `schema:"email"`
+	Password string `schema:"password"`
+}
+
+//Login is used to verify the provided email address
+//and password and then log  the user in if they are correct
+//POST/login
+func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
+	form := LoginForm{}
+	if err := parseForm(r, &form); err != nil {
+		panic(err)
+	}
+	fmt.Fprintln(w, form)
 }
 
 //https://github.com/gorilla/mux
