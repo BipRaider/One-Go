@@ -17,6 +17,8 @@ var (
 	ErrInvalidID = errors.New("models: ID provided was invalid, must be > 0")
 )
 
+const userPwPepper = "secret-random-string" // любую страку написать для усложнения паролей
+
 func NewUserService(connectionInfo string) (*UserService, error) {
 	//Соединение с базой данных  !!ВАЖНО ?parseTime=true  добисывать в конце если надо чтобы выводило время
 	db, err := gorm.Open("mysql", connectionInfo) //"root:alfadog1@/bipusdb?charset=utf8&parseTime=True&loc=Local"
@@ -80,7 +82,8 @@ func first(db *gorm.DB, dst interface{}) error {
 //Create will create the provided user and backfill data
 // like the ID, CreatedAt and UpdateAt fileds.
 func (us *UserService) Create(user *User) error {
-	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost) // используется для хеширования пароля
+	pwBytes := []byte(user.Password + userPwPepper)                              // этим услажнили просто пароль
+	hashedBytes, err := bcrypt.GenerateFromPassword(pwBytes, bcrypt.DefaultCost) // используется для хеширования пароля
 	if err != nil {
 		return err
 	}
