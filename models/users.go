@@ -5,6 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -79,6 +80,12 @@ func first(db *gorm.DB, dst interface{}) error {
 //Create will create the provided user and backfill data
 // like the ID, CreatedAt and UpdateAt fileds.
 func (us *UserService) Create(user *User) error {
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost) // используется для хеширования пароля
+	if err != nil {
+		return err
+	}
+	user.PsswordHash = string(hashedBytes)
+	user.Password = ""
 	return us.db.Create(user).Error
 }
 
@@ -104,7 +111,7 @@ func (us *UserService) Delete(id *uint) error {
 func (us *UserService) Close() error { return us.db.Close() }
 
 //DestructiveReset drops the user table and rebuilds it
-func (us *UserService) DestructiveReset() error {
+func (us *UserService) DestructiveReset() error { // удалит таблицу если существует
 	if err := us.db.DropTableIfExists(&User{}).Error; err != nil {
 		return err
 	}
@@ -124,7 +131,8 @@ func (us *UserService) AutoMigrate() error {
 
 type User struct {
 	gorm.Model
-	Name     string
-	Email    string `gorm:"not null;unique_index"`
-	Password string `gotm: "not null"`
+	Name        string
+	Email       string `gorm:"not null;unique_index"`
+	Password    string `gorm: "-"`
+	PsswordHash string `gorm:not null`
 }
