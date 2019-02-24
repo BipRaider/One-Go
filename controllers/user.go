@@ -55,6 +55,8 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабаты
 
 }
 
+//This is used to render the form where  can create
+// a new FAQ message
 // GET /signup
 func (u *Users) NewFaqGet(w http.ResponseWriter, r *http.Request) {
 	if err := u.NewFaq.Render(w, nil); err != nil {
@@ -95,7 +97,6 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 
 	//-----1.1---1.2---
 	// if err := r.ParseForm(); err != nil { //----1.1----
-	// 	err = errors.New("ERROR func user/Create at ParseForm")
 	// 	os.Exit(8)
 	// }
 	//----1.1---
@@ -108,8 +109,6 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 	// dec := schema.NewDecoder()
 	// form := SignupForm{}
 	// if err := dec.Decode(&form, r.PostForm); err != nil {
-
-	// 	err = errors.New("ERROR func user/Create at Decode")
 	// 	os.Exit(81)
 	// }
 	// fmt.Fprintln(w, form)
@@ -125,25 +124,31 @@ type LoginForm struct {
 //and password and then log  the user in if they are correct
 //POST/login
 func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
+
 	form := LoginForm{}
 	if err := parseForm(r, &form); err != nil {
 		panic(err)
 	}
 	user, err := u.us.Authenticate(form.Email, form.Password)
-	switch err {
-	case models.ErrNotFaund:
-		fmt.Fprintln(w, "Invalid email address.")
-	case models.ErrInvalidPassword:
-		fmt.Fprintln(w, "Invalid password provided.")
-	case nil:
-		fmt.Fprintln(w, user)
-	default:
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	if err != nil {
+		switch err {
+		case models.ErrNotFaund:
+			fmt.Fprintln(w, "Invalid email address.")
+		case models.ErrInvalidPassword:
+			fmt.Fprintln(w, "Invalid password provided.")
+		default:
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 
+		return
+	}
+	cookie := http.Cookie{
+		Name:  "email",
+		Value: user.Email,
+	}
+	http.SetCookie(w, &cookie)
+	fmt.Fprintln(w, user)
 }
 
 //https://github.com/gorilla/mux
 //https://golang.org/pkg/net/http/#pkg-examples -----1.1-----
-
-//152 page
