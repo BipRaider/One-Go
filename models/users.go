@@ -11,10 +11,14 @@ import (
 var (
 	//ErrNorFound is returned when a resource cannot be found
 	// in the database.
-	ErrNorFaund = errors.New("models: resource not found")
+	ErrNotFaund = errors.New("models: resource not found")
 	//ErrInvalidI is returned when  an invalid ID is provided
 	// to a mathod like Delete.
 	ErrInvalidID = errors.New("models: ID provided was invalid, must be > 0")
+
+	ErrInvalidEmail = errors.New("models:invalid email address provided")
+
+	ErrInvalidPassword = errors.New("models :invalid password provided")
 )
 
 const userPwPepper = "secret-random-string" // любую страку написать для усложнения паролей
@@ -68,13 +72,33 @@ func (us *UserService) ByEmail(email string) (*User, error) {
 
 }
 
+//Authenticate  can be used to authenticate a user with the
+// provaided email address and password
+
+func (us *UserService) Authenticate(email, password string) (*User, error) {
+	foundUser, err := us.ByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password+userPwPepper)) // функция для разшифрофки  хешированый пороль
+	if err != nil {
+		switch err {
+		case bcrypt.ErrMismatchedHashAndPassword: ////  выводит ошибку хеша
+			return nil, ErrInvalidPassword
+		default:
+			return nil, err
+		}
+	}
+	return foundUser, err
+}
+
 //first  will query using  the provided gorm.BD and it will
 //get the first item returned and place it into dst. if
 // nothing is found in the query , it will return ErrNotFound
 func first(db *gorm.DB, dst interface{}) error {
 	err := db.First(dst).Error
 	if err == gorm.ErrRecordNotFound {
-		return ErrNorFaund
+		return ErrNotFaund
 	}
 	return err
 }
@@ -87,7 +111,7 @@ func (us *UserService) Create(user *User) error {
 	if err != nil {
 		return err
 	}
-	user.PsswordHash = string(hashedBytes)
+	user.PasswordHash = string(hashedBytes)
 	user.Password = ""
 	return us.db.Create(user).Error
 }
@@ -134,8 +158,8 @@ func (us *UserService) AutoMigrate() error {
 
 type User struct {
 	gorm.Model
-	Name        string
-	Email       string `gorm:"not null;unique_index"`
-	Password    string `gorm: "-"`
-	PsswordHash string `gorm:not null`
+	Name         string
+	Email        string `gorm:"not null;unique_index"`
+	Password     string `gorm: "-"`
+	PasswordHash string `gorm:not null`
 }
