@@ -93,7 +93,8 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 		http.Error(w, err.Error(), http.StatusInternalServerError) // выводит ошибку если в в базе данных есть такой ID
 		return
 	}
-	fmt.Fprintln(w, form, user)
+	signIn(w, &user)
+	http.Redirect(w, r, "/cookietest", http.StatusFound)
 
 	//-----1.1---1.2---
 	// if err := r.ParseForm(); err != nil { //----1.1----
@@ -142,12 +143,8 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	cookie := http.Cookie{
-		Name:  "email",
-		Value: user.Email,
-	}
-	http.SetCookie(w, &cookie)
-	fmt.Fprintln(w, user)
+	signIn(w, user)
+	http.Redirect(w, r, "/cookietest", http.StatusFound)
 }
 
 //CookieTest is used to display cookies set on the current user
@@ -158,6 +155,15 @@ func (us *Users) CookieTest(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintln(w, "Emai is:", cookei.Value)
 
+}
+
+//signIn is used to sign the given user  in via cookies
+func signIn(w http.ResponseWriter, user *models.User) {
+	cookie := http.Cookie{
+		Name:  "email",
+		Value: user.Email,
+	}
+	http.SetCookie(w, &cookie)
 }
 
 //https://github.com/gorilla/mux
