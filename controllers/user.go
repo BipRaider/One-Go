@@ -150,5 +150,15 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, user)
 }
 
+//CookieTest is used to display cookies set on the current user
+func (us *Users) CookieTest(w http.ResponseWriter, r *http.Request) {
+	cookei, err := r.Cookie("email")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	fmt.Fprintln(w, "Emai is:", cookei.Value)
+
+}
+
 //https://github.com/gorilla/mux
 //https://golang.org/pkg/net/http/#pkg-examples -----1.1-----

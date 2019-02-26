@@ -72,6 +72,8 @@ func main() {
 	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
 
+	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
+
 	fmt.Println("Starting the server on :3000...")
 	http.ListenAndServe(":3000", r) //end// это адрес сервера  куда будет отправляться данные
 }
