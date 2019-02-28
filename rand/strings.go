@@ -21,7 +21,7 @@ func Bytes(n int) ([]byte, error) { // генерирует произвольн
 
 //String will generate a byte  slise   of size  nBytes and then
 //return a string that is the base64 URL encoded version
-//of that byte slice
+//of that byte slice.
 func String(nBytes int) (string, error) {
 	b, err := Bytes(nBytes)
 	if err != nil {
@@ -31,7 +31,7 @@ func String(nBytes int) (string, error) {
 }
 
 //RememberToken is a helper function designed to generate
-//remember tokens of a predeterined byte size
+//remember tokens of a predeterined byte size.
 func RememberToken() (string, error) {
 	return String(RemeberTokenBytes)
 }

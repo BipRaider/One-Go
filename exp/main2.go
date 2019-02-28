@@ -1,4 +1,25 @@
-// package main
+package main
+
+import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"fmt"
+
+	"../hash"
+)
+
+func main() {
+
+	toHash := []byte(" ыаф ыва  ыва ыва ы аыва ыва ыва ыва ыа to hash")
+	h := hmac.New(sha256.New, []byte("new-secret-key")) // создаёт новый срез байтов  в вносит первоночальные даные в байтах
+	h.Write(toHash)                                     /// добисывает даные к срезу байта перед этим созданого
+	b := h.Sum(nil)                                     // сумирует
+
+	fmt.Println(base64.URLEncoding.EncodeToString(b))
+	hmac := hash.NewHMAC("new-secret-key")
+	fmt.Println(hmac.Hash("ыаф ыва  ыва ыва ы аыва ыва ыва ыва ыа to hash"))
+}
 
 // import (
 // 	"fmt"
