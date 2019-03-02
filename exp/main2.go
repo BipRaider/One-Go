@@ -1,26 +1,62 @@
 package main
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/base64"
 	"fmt"
 
-	"../hash"
+	"../models"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 func main() {
+	//соединение сайта с базойданых
+	us, err := models.NewUserService("root:alfadog1@/bipusdb?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		panic(err)
+	}
+	defer us.Close()
+	//us.DestructiveReset()
+	us.AutoMigrate()
 
-	toHash := []byte(" ыаф ыва  ыва ыва ы аыва ыва ыва ыва ыа to hash")
-	h := hmac.New(sha256.New, []byte("new-secret-key")) // создаёт новый срез байтов  в вносит первоночальные даные в байтах
-	h.Write(toHash)                                     /// добисывает даные к срезу байта перед этим созданого
-	b := h.Sum(nil)                                     // сумирует
-
-	fmt.Println(base64.URLEncoding.EncodeToString(b))
-	hmac := hash.NewHMAC("new-secret-key")
-	fmt.Println(hmac.Hash("ыаф ыва  ыва ыва ы аыва ыва ыва ыва ыа to hash"))
+	// user := models.User{
+	// 	Name:     "jon13",
+	// 	Email:    "jon@com31",
+	// 	Password: "jon13",
+	// 	Remember: "123qq3q",
+	// }
+	// us.Create(&user)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(user)
+	user2, err := us.ByRemember("123456")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(*user2)
 }
 
+// //--------------------------------------------------2--------------------------------------------
+// import (
+// 	"crypto/hmac"
+// 	"crypto/sha256"
+// 	"encoding/base64"
+// 	"fmt"
+
+// 	"../hash"
+// )
+
+// func main() {
+
+// 	toHash := []byte(" ыаф ыва  ыва ыва ы аыва ыва ыва ыва ыа to hash")
+// 	h := hmac.New(sha256.New, []byte("new-secret-key")) // создаёт новый срез байтов  в вносит первоночальные даные в байтах
+// 	h.Write(toHash)                                     /// добисывает даные к срезу байта перед этим созданого
+// 	b := h.Sum(nil)                                     // сумирует
+
+// 	fmt.Println(base64.URLEncoding.EncodeToString(b))
+// 	hmac := hash.NewHMAC("new-secret-key")
+// 	fmt.Println(hmac.Hash("ыаф ыва  ыва ыва ы аыва ыва ыва ыва ыа to hash"))
+// }
+////----------------------------------------------------1-------------------------------------
 // import (
 // 	"fmt"
 // 	"net/http"
