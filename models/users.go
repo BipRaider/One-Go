@@ -146,6 +146,7 @@ func (us *UserService) Create(user *User) error {
 			return err
 		}
 		user.Remember = token
+
 	}
 	user.RememberHash = us.hmac.Hash(user.Remember)
 

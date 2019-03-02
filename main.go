@@ -44,8 +44,8 @@ func main() {
 	us, err := models.NewUserService(mysqlinfo)
 	must(err, 3)
 	defer us.Close()
-	//us.DestructiveReset()
-	us.AutoMigrate()
+	us.DestructiveReset()
+	//us.AutoMigrate()
 
 	r := mux.NewRouter() //1 begin
 

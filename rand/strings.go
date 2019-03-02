@@ -1,5 +1,6 @@
 package rand
 
+/// для генераций произвольной строики
 import (
 	"crypto/rand"
 	"encoding/base64"

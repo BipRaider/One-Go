@@ -1,5 +1,6 @@
 package hash
 
+// Для хеширования данных
 import (
 	"crypto/hmac"
 	"crypto/sha256"
