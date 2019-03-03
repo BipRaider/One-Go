@@ -174,8 +174,10 @@ func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
 	}
 
 	cookie := http.Cookie{
-		Name:  "remember_token",
-		Value: user.Remember,
+		Name:     "remember_token",
+		Value:    user.Remember,
+		HttpOnly: true, ////Когда вы помечаете куки с флагом HttpOnly, он сообщает браузеру,
+		// что этот конкретный куки должен быть доступен только серверу. Любая попытка доступа к куки из клиентского скрипта строго запрещена.
 	}
 	http.SetCookie(w, &cookie)
 	return nil

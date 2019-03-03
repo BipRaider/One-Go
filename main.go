@@ -44,8 +44,8 @@ func main() {
 	us, err := models.NewUserService(mysqlinfo)
 	must(err, 3)
 	defer us.Close()
-	us.DestructiveReset()
-	//us.AutoMigrate()
+	//us.DestructiveReset()
+	us.AutoMigrate()
 
 	r := mux.NewRouter() //1 begin
 
@@ -90,3 +90,5 @@ func must(err error, n int) {
 }
 
 //https://dev.mysql.com/doc/workbench/en/wb-mysql-connections-navigator-management-users-and-privileges.html
+
+//https://tproger.ru/translations/go-web-server/amp/ получени сертифеката https
