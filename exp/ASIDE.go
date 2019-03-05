@@ -56,14 +56,15 @@ func (sp SpeakerPrefer) Speak(g string) { // при использования  
 	fmt.Print("Gaga :" + gg) // выводим результат// данный результат будет будет отоброжаться в функций  что мы использовали
 	sp.Speaker.Speak(gg)     /// дублирует сообщения //если не водить данную строку то будет вывод в терменале в одну строку
 }
-func (sp SpeakerPrefer) La(h int) {
-	switch h {
-	case 3:
-		fmt.Print("La 3=:", h)
-	case 5:
+func (sp SpeakerPrefer) La(h int) { //можно проверять на соотвецтвие данных  // раюботать как фильтр данных поступаюсщих в функцию
+	switch {
+	case h != 3:
+		fmt.Print("La true")
+	case h >= 5:
 		fmt.Print("La 5:")
 	default:
-		fmt.Print("La :")
+		h = 0
+		fmt.Print("do not =")
 	}
 
 	sp.Speaker.La(h) //если не водить данную строку то будет вывод в терменале в одну строку
@@ -72,6 +73,16 @@ func main() {
 
 	h := Husky{SpeakerPrefer{&Dog{}}} // интерфейс удолитворяет  любой интерфейс с индентичными данными
 	h.La(3)                           //equal to h.Speaker.Speak()
-	h.Speak("sad")
-	fmt.Println(h)
+
+}
+
+//  Может работать как машина развощик : получая по пути данные  и довозить до окончательного пути всё что насобирае.
+var InterfaceCar = DriverHusky{
+	Speaker: OneInput{
+		Speaker: TwoInput{
+			Speaker: FreeInput{
+				Speaker: FoorInput{
+			},
+		},
+	},
 }
