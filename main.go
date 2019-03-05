@@ -12,21 +12,8 @@ import (
 )
 
 var (
-	// homeView    *views.View
-	// conatctView *views.View
 	NotF *views.View
 )
-
-//-----2-----
-// func home(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "text/html")
-// 	must(homeView.Render(w, nil), 1)
-// }
-
-// func contact(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "text/html")
-// 	must(conatctView.Render(w, nil), 2)
-// }
 
 func notFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
