@@ -12,7 +12,7 @@ import (
 
 const bs string = "bootstrap"
 
-func NewUser(us *models.UserService) *Users {
+func NewUser(us models.UserService) *Users {
 	return &Users{
 		NewView:   views.NewView(bs, "users/new"),
 		NewFaq:    views.NewView(bs, "users/faq"),
@@ -25,7 +25,7 @@ type Users struct {
 	NewView   *views.View
 	NewFaq    *views.View
 	LoginView *views.View
-	us        *models.UserService
+	us        models.UserService
 }
 
 //GET Reading a resource ПОЛУЧИТЬ Чтение ресурса

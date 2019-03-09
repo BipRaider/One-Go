@@ -73,16 +73,17 @@ func main() {
 
 	h := Husky{SpeakerPrefer{&Dog{}}} // интерфейс удолитворяет  любой интерфейс с индентичными данными
 	h.La(3)                           //equal to h.Speaker.Speak()
+	var d, s float64 = 23.324, 2345.3214
 
 }
 
 //  Может работать как машина развощик : получая по пути данные  и довозить до окончательного пути всё что насобирае.
-var InterfaceCar = DriverHusky{
-	Speaker: OneInput{
-		Speaker: TwoInput{
-			Speaker: FreeInput{
-				Speaker: FoorInput{
-			},
-		},
-	},
-}
+// var InterfaceCar = DriverHusky{
+// 	Speaker: OneInput{
+// 		Speaker: TwoInput{
+// 			Speaker: FreeInput{
+// 				Speaker: FoorInput{
+// 			},
+// 		},
+// 	},
+// }
