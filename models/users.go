@@ -157,14 +157,7 @@ func (uv *userValidator) ByRemember(token string) (*User, error) {
 //Create will create the provided user and backfill data
 // like the ID, CreatedAt and UpdateAt fileds.
 func (uv *userValidator) Create(user *User) error {
-	if user.Remember == "" {
-		token, err := rand.RememberToken() //c генерирует рэндом токен
-		if err != nil {
-			return err
-		}
-		user.Remember = token
-	}
-	err := runUserValFuncs(user, uv.bcryptPassword, uv.hmacRemember)
+	err := runUserValFuncs(user, uv.bcryptPassword, uv.setRememberIfUnset, uv.hmacRemember)
 	if err != nil {
 		return err
 	}
@@ -209,6 +202,20 @@ func (uv *userValidator) hmacRemember(user *User) error {
 		return nil
 	}
 	user.RememberHash = uv.hmac.Hash(user.Remember)
+	return nil
+}
+
+func (uv *userValidator) setRememberIfUnset(user *User) error {
+	if user.Remember == "" {
+		return nil
+	}
+
+	token, err := rand.RememberToken() //c генерирует рэндом токен
+	if err != nil {
+		return err
+	}
+	user.Remember = token
+
 	return nil
 }
 
