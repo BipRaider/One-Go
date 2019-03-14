@@ -8,7 +8,7 @@ import (
 	"hash"
 )
 
-//NeWHMAC creates and returns a new HMAC object
+//NewHMAC creates and returns a new HMAC object
 func NewHMAC(key string) HMAC {
 	h := hmac.New(sha256.New, []byte(key))
 	return HMAC{
