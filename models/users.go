@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"strings"
 
 	"../hash"
 	"../rand"
@@ -141,6 +142,18 @@ type userValidator struct {
 	hmac hash.HMAC
 }
 
+// ByEmail will normalize the email address before calling
+// ByEmail an the UserDB field.
+func (uv *userValidator) ByEmail(email string) (*User, error) {
+	user := User{
+		Email: email,
+	}
+	if err := runUserValFuncs(&user, uv.normalizeEmail); err != nil {
+		return nil, err
+	}
+	return uv.UserDB.ByEmail(user.Email)
+}
+
 //ByRemember will hash the remember token and  then call
 //Byremember on the subsequent UserDB layer
 func (uv *userValidator) ByRemember(token string) (*User, error) {
@@ -157,7 +170,12 @@ func (uv *userValidator) ByRemember(token string) (*User, error) {
 //Create will create the provided user and backfill data
 // like the ID, CreatedAt and UpdateAt fileds.
 func (uv *userValidator) Create(user *User) error {
-	err := runUserValFuncs(user, uv.bcryptPassword, uv.setRememberIfUnset, uv.hmacRemember)
+	err := runUserValFuncs(user,
+		uv.bcryptPassword,
+		uv.setRememberIfUnset,
+		uv.hmacRemember,
+		uv.normalizeEmail,
+		uv.requireEmail)
 	if err != nil {
 		return err
 	}
@@ -166,7 +184,11 @@ func (uv *userValidator) Create(user *User) error {
 
 //Update will hash a remembeer token if it is  provided .
 func (uv *userValidator) Update(user *User) error {
-	err := runUserValFuncs(user, uv.bcryptPassword, uv.hmacRemember)
+	err := runUserValFuncs(user,
+		uv.bcryptPassword,
+		uv.hmacRemember,
+		uv.normalizeEmail,
+		uv.requireEmail)
 	if err != nil {
 		return err
 	}
@@ -227,7 +249,19 @@ func (uv *userValidator) idGreaterThan(n uint) userValFunc {
 		}
 		return nil
 	})
+}
+func (uv *userValidator) normalizeEmail(user *User) error {
+	user.Email = strings.ToLower(user.Email)   // выводит каждой буквы уникодовское  цифры нижнего регистра
+	user.Email = strings.TrimSpace(user.Email) // уберает все (\t \r \n) из строки
 
+	return nil
+}
+
+func (uv *userValidator) requireEmail(user *User) error {
+	if user.Email == "" {
+		return errors.New("Email address is required")
+	}
+	return nil
 }
 
 var _ UserDB = &userGorm{}
