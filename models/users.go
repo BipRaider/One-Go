@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"regexp"
 	"strings"
 
 	"../hash"
@@ -22,8 +23,15 @@ var (
 	ErrInvalidID = errors.New("models: ID provided was invalid, must be > 0")
 
 	ErrInvalidEmail = errors.New("models:invalid email address provided")
-
+	// ErrInvalidPassword is returned when an invalid password
+	//is used when attempting to authenticate a user.
 	ErrInvalidPassword = errors.New("models :invalid password provided")
+	//ErrEmailRequired  is returned  when  an email address is
+	// not provided when creating a user
+	ErrEmailRequired = errors.New("models :Email address is required")
+	//ErrEmailInvalid is returned  when an email address provaided
+	// does not match any of our requirements
+	ErrEmailInvalid = errors.New("models :Email address is not valid")
 )
 
 const userPwPepper = "secret-random-string" // любую страку написать для усложнения паролей
@@ -124,6 +132,7 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 	return foundUser, err
 }
 
+//-------------------------------------------------------------------------------
 type userValFunc func(*User) error
 
 func runUserValFuncs(user *User, fns ...userValFunc) error {
@@ -135,11 +144,21 @@ func runUserValFuncs(user *User, fns ...userValFunc) error {
 	return nil
 }
 
+//-----------------------------------------------------------------------------
 var _ UserDB = &userValidator{}
+
+func newUserVakidator(udb UserDB, hmac hash.HMAC) *userValidator {
+	return &userValidator{
+		UserDB:     udb,
+		hmac:       hmac,
+		emailRegex: regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,16}$`), // используется для сопоставления адресов электронной почты
+	}
+}
 
 type userValidator struct {
 	UserDB
-	hmac hash.HMAC
+	hmac       hash.HMAC
+	emailRegex *regexp.Regexp
 }
 
 // ByEmail will normalize the email address before calling
@@ -259,11 +278,18 @@ func (uv *userValidator) normalizeEmail(user *User) error {
 
 func (uv *userValidator) requireEmail(user *User) error {
 	if user.Email == "" {
-		return errors.New("Email address is required")
+		return ErrEmailRequired
+	}
+	return nil
+}
+func (uv *userValidator) emailFormat(user *User) error {
+	if !uv.emailRegex.MatchString(user.Email) {
+		return ErrEmailInvalid
 	}
 	return nil
 }
 
+///----------------------------------------------------------------------------------------------------------------------------
 var _ UserDB = &userGorm{}
 
 func newUserGorm(connectionInfo string) (*userGorm, error) {
