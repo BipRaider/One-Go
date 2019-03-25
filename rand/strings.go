@@ -23,16 +23,16 @@ func Bytes(n int) ([]byte, error) { // генерирует произвольн
 //String will generate a byte  slise   of size  nBytes and then
 //return a string that is the base64 URL encoded version
 //of that byte slice.
-func String(nBytes int) (string, error) {
+func String(nBytes int) (string, error) { //c генерируемый рэндом токен преобразуется в строку
 	b, err := Bytes(nBytes)
 	if err != nil {
 		return "", err
 	}
-	return base64.URLEncoding.EncodeToString(b), nil
+	return base64.URLEncoding.EncodeToString(b), nil // приоброзовали срез байтов в строку
 }
 
 //RememberToken is a helper function designed to generate
 //remember tokens of a predeterined byte size.
-func RememberToken() (string, error) { //c генерирует рэндом токен
+func RememberToken() (string, error) { //c генерируется рэндом токен с колицеством символов что мы в ведём
 	return String(RemeberTokenBytes)
 }
