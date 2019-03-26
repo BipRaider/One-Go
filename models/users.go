@@ -70,7 +70,7 @@ type UserDB interface {
 	//Methods for altering users
 	Create(user *User) error
 	Update(user *User) error
-	Delete(id *uint) error
+	Delete(id uint) error
 
 	// Used to close  a DB connectionInfo
 	Close() error
@@ -101,7 +101,6 @@ func NewUserService(connectionInfo string) (UserService, error) {
 	}
 	hmac := hash.NewHMAC(hmacSecretKey)
 	uv := newUserValidator(ug, hmac)
-
 	return &userService{
 		UserDB: uv,
 	}, nil
@@ -136,10 +135,11 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 //-------------------------------------------------------------------------------
 type userValFunc func(*User) error
 
+//проверяет на ошибкию если есть ошибки выводит их в браузере
 func runUserValFuncs(user *User, fns ...userValFunc) error {
 	for _, fn := range fns {
 		if err := fn(user); err != nil {
-			return nil
+			return err //выводит ошибку
 		}
 	}
 	return nil
@@ -161,7 +161,7 @@ func newUserValidator(udb UserDB, hmac hash.HMAC) *userValidator {
 type userValidator struct {
 	UserDB
 	hmac       hash.HMAC
-	emailRegex *regexp.Regexp
+	emailRegex *regexp.Regexp //https://gobyexample.com/regular-expressions
 }
 
 // ByEmail will normalize the email address before calling
@@ -221,9 +221,9 @@ func (uv *userValidator) Update(user *User) error {
 	return uv.UserDB.Update(user)
 }
 
-func (uv *userValidator) Delete(id *uint) error {
+func (uv *userValidator) Delete(id uint) error {
 	var user User
-	user.ID = *id
+	user.ID = id
 	err := runUserValFuncs(&user, uv.idGreaterThan(0))
 	if err != nil {
 		return err
@@ -249,6 +249,7 @@ func (uv *userValidator) bcryptPassword(user *User) error {
 	return nil
 }
 
+///
 func (uv *userValidator) hmacRemember(user *User) error {
 	if user.Remember == "" {
 		return nil
@@ -257,6 +258,7 @@ func (uv *userValidator) hmacRemember(user *User) error {
 	return nil
 }
 
+///
 func (uv *userValidator) setRememberIfUnset(user *User) error {
 	if user.Remember == "" {
 		return nil
@@ -268,6 +270,8 @@ func (uv *userValidator) setRememberIfUnset(user *User) error {
 	user.Remember = token
 	return nil
 }
+
+/////
 func (uv *userValidator) idGreaterThan(n uint) userValFunc {
 	return userValFunc(func(user *User) error {
 		if user.ID <= n {
@@ -276,30 +280,36 @@ func (uv *userValidator) idGreaterThan(n uint) userValFunc {
 		return nil
 	})
 }
+
+/////
 func (uv *userValidator) normalizeEmail(user *User) error {
 	user.Email = strings.ToLower(user.Email)   // выводит каждой буквы уникодовское  цифры нижнего регистра
 	user.Email = strings.TrimSpace(user.Email) // уберает все (\t \r \n) из строки
-
 	return nil
 }
 
+////
 func (uv *userValidator) requireEmail(user *User) error {
 	if user.Email == "" {
 		return ErrEmailRequired
 	}
 	return nil
 }
+
+// проверяет правельность заполнения мыла
 func (uv *userValidator) emailFormat(user *User) error {
 	if user.Email == "" {
 		return nil
 	}
-	if uv.emailRegex.MatchString(user.Email) {
+	if !uv.emailRegex.MatchString(user.Email) {
+		//если мыло не соотвецтвует данной форме выводится ошибка
 		return ErrEmailInvalid
 	}
-
 	return nil
+
 }
 
+//проверяет на наличие мыла в базе данных и выыодит ошибку если такое мыло есть
 func (uv *userValidator) emailIsAvail(user *User) error {
 	existing, err := uv.ByEmail(user.Email)
 	if err == ErrNotFaund {
@@ -408,10 +418,10 @@ func (ug *userGorm) Update(user *User) error {
 }
 
 //Delete will delete the user with the proveided ID
-func (ug *userGorm) Delete(id *uint) error {
+func (ug *userGorm) Delete(id uint) error {
 	user := User{
 		Model: gorm.Model{
-			ID: *id,
+			ID: id,
 		},
 	}
 	return ug.db.Delete(&user).Error
