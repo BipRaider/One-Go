@@ -7,14 +7,16 @@
     
   </head>
 <body >
-    {{template "navbar"}}
+    {{template "navbar"}}  <!-- выводит шаблон(template) navbar-->
 
     
     <div class="container-fluid" >
-      {{template "alert" .}}
-      {{template "yield" .}}
+      {{if .Alert}}    <!-- Если type Alert то выполнить следуещее действие -->
+        {{template "alert" .Alert}} <!-- выводит шаблон(template) alert c данными от типа Alert -->
+      {{end}}
+      {{template "yield" .Yield}}   
       
-      {{template "footer"}}
+      {{template "footer"}}<!-- выводит шаблон(template) footer-->
     </div>
 
     <!-- jquery & Bootstrap JS -->

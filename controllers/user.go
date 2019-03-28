@@ -54,11 +54,19 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабаты
 		Level   string
 		Message string
 	}
+	type Data struct {
+		Alert Alert
+		Yield interface{}
+	}
 	a := Alert{
 		Level:   "warning",                                // можно вписать такие имена  класа success,info,danger,warning
 		Message: "Successfully rendered a dynamic alert!", // выводин на экран данное сообщение
 	}
-	if err := u.NewView.Render(w, a); err != nil {
+	d := Data{
+		Alert: a,
+		Yield: "Hello!",
+	}
+	if err := u.NewView.Render(w, d); err != nil {
 		os.Exit(9)
 	}
 
