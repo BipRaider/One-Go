@@ -1,8 +1,8 @@
 {{define "alert"}}
 
-<div class="alert alert-danger alert-dismissible" role="alert">
+<div class="alert alert-{{.Level}} alert-dismissible" role="alert"> 
+ <!-- alert-{{.Level}} Выводим на эктран нужный клас alert https://getbootstrap.com/docs/3.3/components/#alerts   --> 
   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  <strong>Warning!</strong> Better check yourself, you're not looking too good.
+      {{.Message}}    <!-- {{.Message}}  Выводим на эктран нужное сообщение   -->  
 </div>
-
 {{end}}

@@ -50,7 +50,15 @@ type Users struct {
 // новая учетная запись пользователя
 // GET /signup
 func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабатывает Html шаблоны и вывоодит в браузер .
-	if err := u.NewView.Render(w, nil); err != nil {
+	type Alert struct {
+		Level   string
+		Message string
+	}
+	a := Alert{
+		Level:   "warning",                                // можно вписать такие имена  класа success,info,danger,warning
+		Message: "Successfully rendered a dynamic alert!", // выводин на экран данное сообщение
+	}
+	if err := u.NewView.Render(w, a); err != nil {
 		os.Exit(9)
 	}
 
