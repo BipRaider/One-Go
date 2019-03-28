@@ -12,12 +12,22 @@ const RemeberTokenBytes = 32
 //return an error if there was one. This uses the crypto/rand
 // package so it safe to use with things like remeber tokens.
 func Bytes(n int) ([]byte, error) { // генерирует произвольные числа  в заданом количестве (n)
-	b := make([]byte, n)   // определяем длину среза
-	_, err := rand.Read(b) // возвратит nil  если  b == 0
+	b := make([]byte, n)   // создает срез байтов этой длины.
+	_, err := rand.Read(b) // fункцию Read из пакета crypto/rand,проверяет наличие ошибок и возвращает срез байтов, если ошибок нет.
 	if err != nil {
 		return nil, err
 	}
 	return b, nil
+}
+
+//NBytes  return the nember of bytes used the base64
+//URL encoded string.
+func NBytes(bese64String string) (int, error) {
+	b, err := base64.URLEncoding.DecodeString(bese64String) //возвращает количество байтов, использованных в кодированной строке base64URL
+	if err != nil {
+		return -1, err
+	}
+	return len(b), nil
 }
 
 //String will generate a byte  slise   of size  nBytes and then
