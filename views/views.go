@@ -72,8 +72,18 @@ func addTemlateExt(files []string) { //Добавит ".gohml"
 }
 
 // Функция  которая выводит в браузер нужную файл и какого шаблона , 1.2
+//Render is used to render the viewwith the predefind layout
 func (v *View) Render(w http.ResponseWriter, data interface{}) error {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8") // надо указывать кодировку ;charset=utf-8
+	switch data.(type) {
+	case Data:
+		// do nothing
+	default:
+		data = Data{
+			Yield: data,
+		}
+	}
+
 	return v.Template.ExecuteTemplate(w, v.Layout, data)
 }
 

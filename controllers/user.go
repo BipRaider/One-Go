@@ -50,21 +50,12 @@ type Users struct {
 // новая учетная запись пользователя
 // GET /signup
 func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабатывает Html шаблоны и вывоодит в браузер .
-	type Alert struct {
-		Level   string
-		Message string
-	}
-	type Data struct {
-		Alert Alert
-		Yield interface{}
-	}
-	a := Alert{
-		Level:   "warning",                                // можно вписать такие имена  класа success,info,danger,warning
-		Message: "Successfully rendered a dynamic alert!", // выводин на экран данное сообщение
-	}
-	d := Data{
-		Alert: a,
-		Yield: "Hello!",
+	d := views.Data{
+		Alert: &views.Alert{
+			Level:   views.AlertLvlError,
+			Message: "something went wrong",
+		},
+		Yield: "Hello",
 	}
 	if err := u.NewView.Render(w, d); err != nil {
 		os.Exit(9)
@@ -76,7 +67,13 @@ func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабаты
 // a new FAQ message
 // GET /signup
 func (u *Users) NewFaqGet(w http.ResponseWriter, r *http.Request) {
-	if err := u.NewFaq.Render(w, nil); err != nil {
+	d := views.Data{
+		Alert: &views.Alert{
+			Level:   views.AlertLvlInfo,
+			Message: "something went wrong",
+		},
+	}
+	if err := u.NewFaq.Render(w, d); err != nil {
 		os.Exit(91)
 	}
 }
