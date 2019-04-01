@@ -321,7 +321,6 @@ func (uv *userValidator) rememberHashRequired(user *User) error {
 	if user.RememberHash == "" {
 		return ErrRememberRequired
 	}
-
 	return nil
 }
 

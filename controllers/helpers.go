@@ -8,6 +8,7 @@ import (
 
 // функция  обработки в водимых данных user an faq
 func parseForm(r *http.Request, dst interface{}) error {
+
 	if err := r.ParseForm(); err != nil {
 		return err
 	}

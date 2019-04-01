@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
-	"os"
 
 	"../models"
 	"../rand"
@@ -50,31 +50,17 @@ type Users struct {
 // новая учетная запись пользователя
 // GET /signup
 func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабатывает Html шаблоны и вывоодит в браузер .
-	d := views.Data{
-		Alert: &views.Alert{
-			Level:   views.AlertLvlError,
-			Message: "something went wrong",
-		},
-		Yield: "Hello",
+	if err := u.NewView.Render(w, nil); err != nil {
+		panic(err)
 	}
-	if err := u.NewView.Render(w, d); err != nil {
-		os.Exit(9)
-	}
-
 }
 
 //This is used to render the form where  can create
 // a new FAQ message
 // GET /signup
 func (u *Users) NewFaqGet(w http.ResponseWriter, r *http.Request) {
-	d := views.Data{
-		Alert: &views.Alert{
-			Level:   views.AlertLvlInfo,
-			Message: "something went wrong",
-		},
-	}
-	if err := u.NewFaq.Render(w, d); err != nil {
-		os.Exit(91)
+	if err := u.NewFaq.Render(w, nil); err != nil {
+		panic(err)
 	}
 }
 
@@ -94,9 +80,16 @@ type SignupForm struct {
 
 func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обрабатывает в водимые данные в браузере
 	//----1.3---
+	var vd views.Data
 	var form SignupForm
 	if err := parseForm(r, &form); err != nil {
-		os.Exit(82)
+		log.Println(err)
+		vd.Alert = &views.Alert{
+			Level:   views.AlertLvlError,
+			Message: views.AlertMsgGeneric,
+		}
+		u.NewView.Render(w, vd)
+		return
 	}
 	user := models.User{
 		Name:     form.Name,
@@ -104,12 +97,18 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 		Password: form.Password,
 	}
 	if err := u.us.Create(&user); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError) // выводит ошибку если в в базе данных есть такой ID
+		vd.Alert = &views.Alert{
+			Level:   views.AlertLvlError,
+			Message: err.Error(), //выводяться ошибки в браузере  из пакета models
+		}
+		// http.Error(w, err.Error(), http.StatusInternalServerError) // выводит ошибку если в в базе данных есть такой ID
+		u.NewView.Render(w, vd)
 		return
 	}
 	err := u.signIn(w, &user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
 
@@ -159,7 +158,6 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-
 		return
 	}
 

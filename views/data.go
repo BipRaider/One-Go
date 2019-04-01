@@ -5,6 +5,10 @@ const (
 	AlertLvlWarning = "warning"
 	AlertLvlInfo    = "info"
 	AlertLvSuccess  = "success"
+
+	//AlertMsgGeneric is displayed when any random errror
+	//is encountered by our backend.
+	AlertMsgGeneric = "Something went wrong .Please try again ,and contact us if the problem persists"
 )
 
 //Alert is used to render Bootstrap Alert messager in the
