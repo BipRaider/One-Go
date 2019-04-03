@@ -25,7 +25,7 @@ type Data struct {
 }
 
 //----------------------------
-// SerAler  return errors to rendered  ib brauzer
+// SerAler  возвращает ошибки в барузер
 func (d *Data) SetAlert(err error) {
 	if pErr, ok := err.(PiblicError); ok {
 		d.Alert = &Alert{
@@ -37,6 +37,14 @@ func (d *Data) SetAlert(err error) {
 			Level:   AlertLvlError,
 			Message: AlertMsgGeneric,
 		}
+	}
+}
+
+// AlertError  выводит ошибки в сообщений на экран ,что мы задаём.
+func (d *Data) AlertError(msg string) {
+	d.Alert = &Alert{
+		Level:   AlertLvlError,
+		Message: msg,
 	}
 }
 

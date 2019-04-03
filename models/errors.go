@@ -11,19 +11,19 @@ const (
 	// to a mathod like Delete.
 	ErrInvalidID modelError = "models: ID provided was invalid, must be > 0"
 
-	ErrInvalidEmail modelError = "models:invalid email address provided"
+	ErrInvalidEmail modelError = "models: invalid email address provided"
 
 	// ErrInvalidPassword is returned when an invalid password
 	//is used when attempting to authenticate a user.
-	ErrPasswordInCorrect modelError = "models :invalid password provided"
+	ErrPasswordInCorrect modelError = "models: invalid password provided"
 
 	//ErrEmailRequired  is returned  when  an email address is
 	// not provided when creating a user
-	ErrEmailRequired modelError = "models :Email address is required"
+	ErrEmailRequired modelError = "models: Email address is required"
 
 	//ErrEmailInvalid is returned  when an email address provaided
 	// does not match any of our requirements
-	ErrEmailInvalid modelError = "models :Email address is not valid"
+	ErrEmailInvalid modelError = "models: Email address is not valid"
 
 	//ErrEmailTaken  is returned  when an update or create is attempted
 	//with an email address that is already in use.
