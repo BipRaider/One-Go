@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"regexp"
 	"strings"
 
@@ -12,50 +11,6 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 
 	"golang.org/x/crypto/bcrypt"
-)
-
-var (
-	//ErrNorFound is returned when a resource cannot be found
-	// in the database.
-	ErrNotFaund = errors.New("models: resource not found")
-
-	//ErrInvalidI is returned when  an invalid ID is provided
-	// to a mathod like Delete.
-	ErrInvalidID = errors.New("models: ID provided was invalid, must be > 0")
-
-	ErrInvalidEmail = errors.New("models:invalid email address provided")
-
-	// ErrInvalidPassword is returned when an invalid password
-	//is used when attempting to authenticate a user.
-	ErrPasswordInCorrect = errors.New("models :invalid password provided")
-
-	//ErrEmailRequired  is returned  when  an email address is
-	// not provided when creating a user
-	ErrEmailRequired = errors.New("models :Email address is required")
-
-	//ErrEmailInvalid is returned  when an email address provaided
-	// does not match any of our requirements
-	ErrEmailInvalid = errors.New("models :Email address is not valid")
-
-	//ErrEmailTaken  is returned  when an update or create is attempted
-	//with an email address that is already in use.
-	ErrEmailTaken = errors.New("models: Email address is already taken")
-
-	//ErrPasswordTooShort is returned when  an update or create is
-	//attempted with a user password that is less than 8 characters.
-	ErrPasswordTooShort = errors.New("modrls: Passsword must be at least 8 characters ling")
-
-	// ErrPasswordRequired is returned when an create is attempted
-	//without a user  password  provided.
-	ErrPasswordRequired = errors.New("modrls: Passsword is required")
-
-	//ErrRememberTooShort is returned when a remember token is not
-	//at the least 32 bytes
-	ErrRememberTooShort = errors.New("models: Remember token must be at bytes")
-
-	// ErrRememberRequired is returned when an create or update is attempted
-	//without a valid user remember token hash.
-	ErrRememberRequired = errors.New("models: Remember token is required")
 )
 
 const userPwPepper = "secret-random-string" // любую страку написать для усложнения паролей

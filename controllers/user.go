@@ -84,10 +84,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 	var form SignupForm
 	if err := parseForm(r, &form); err != nil {
 		log.Println(err)
-		vd.Alert = &views.Alert{
-			Level:   views.AlertLvlError,
-			Message: views.AlertMsgGeneric,
-		}
+		vd.SetAlert(err)
 		u.NewView.Render(w, vd)
 		return
 	}
@@ -97,17 +94,13 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 		Password: form.Password,
 	}
 	if err := u.us.Create(&user); err != nil {
-		vd.Alert = &views.Alert{
-			Level:   views.AlertLvlError,
-			Message: err.Error(), //выводяться ошибки в браузере  из пакета models
-		}
-		// http.Error(w, err.Error(), http.StatusInternalServerError) // выводит ошибку если в в базе данных есть такой ID
+		vd.SetAlert(err)
 		u.NewView.Render(w, vd)
 		return
 	}
 	err := u.signIn(w, &user)
 	if err != nil {
-		// http.Error(w, err.Error(), http.StatusInternalServerError)
+
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}

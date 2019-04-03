@@ -24,11 +24,23 @@ type Data struct {
 	Yield interface{}
 }
 
-// a := Alert{
-// 	Level:   "warning",                                // можно вписать такие имена  класа success,info,danger,warning
-// 	Message: "Successfully rendered a dynamic alert!", // выводин на экран данное сообщение
-// }
-// d := Data{
-// 	Alert: a,
-// 	Yield: "Hello!",
-// }
+//----------------------------
+// SerAler  return errors to rendered  ib brauzer
+func (d *Data) SetAlert(err error) {
+	if pErr, ok := err.(PiblicError); ok {
+		d.Alert = &Alert{
+			Level:   AlertLvlError,
+			Message: pErr.Public(),
+		}
+	} else {
+		d.Alert = &Alert{
+			Level:   AlertLvlError,
+			Message: AlertMsgGeneric,
+		}
+	}
+}
+
+type PiblicError interface {
+	error
+	Public() string
+}

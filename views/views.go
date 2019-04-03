@@ -94,6 +94,7 @@ func (v *View) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//------------------------------------------------------------
 //Template errors
 func NotFound() *View {
 	Name := "bootstrap"
