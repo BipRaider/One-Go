@@ -77,7 +77,7 @@ type SignupForm struct {
 // создать новую учетную запись пользователя.
 //
 //POST /signup
-
+///
 func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обрабатывает в водимые данные в браузере
 	//----1.3---
 	var vd views.Data
