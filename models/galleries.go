@@ -8,3 +8,19 @@ type Gallery struct {
 	UserID uint   `gorm:"not_null;index"`
 	Title  string `gotm:"not_null"`
 }
+
+type GalleryService interface {
+	GalleryDB
+}
+
+type GalleryDB interface {
+	Create(gallery *Gallery) error
+}
+
+// func (gd *galleryGorm) Create(g *Gallery) error {
+
+// }
+
+type galleryGorm struct {
+	db *gorm.DB
+}
