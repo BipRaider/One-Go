@@ -90,8 +90,8 @@ func (v *View) Render(w http.ResponseWriter, data interface{}) {
 			Yield: data,
 		}
 	}
-	var buf bytes.Buffer
 
+	var buf bytes.Buffer
 	if err := v.Template.ExecuteTemplate(&buf, v.Layout, data); err != nil {
 		http.Error(w, "Something went wrong. If the problem  persists , please email support@thebipus.com ", http.StatusInternalServerError)
 		return

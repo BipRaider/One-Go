@@ -49,6 +49,7 @@ type Users struct {
 //Это используется для визуализации формы, где можно создать
 // новая учетная запись пользователя
 // GET /signup
+
 func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабатывает Html шаблоны и вывоодит в браузер .
 	u.NewView.Render(w, nil)
 }
