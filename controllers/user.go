@@ -50,18 +50,14 @@ type Users struct {
 // новая учетная запись пользователя
 // GET /signup
 func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабатывает Html шаблоны и вывоодит в браузер .
-	if err := u.NewView.Render(w, nil); err != nil {
-		panic(err)
-	}
+	u.NewView.Render(w, nil)
 }
 
 //This is used to render the form where  can create
 // a new FAQ message
 // GET /signup
 func (u *Users) NewFaqGet(w http.ResponseWriter, r *http.Request) {
-	if err := u.NewFaq.Render(w, nil); err != nil {
-		panic(err)
-	}
+	u.NewFaq.Render(w, nil)
 }
 
 type SignupForm struct {
@@ -100,7 +96,6 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 	}
 	err := u.signIn(w, &user)
 	if err != nil {
-
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}

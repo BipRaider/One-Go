@@ -18,7 +18,7 @@ var (
 func notFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusNotFound)
-	must(NotF.Render(w, nil), 404)
+	NotF.Render(w, nil)
 
 }
 
