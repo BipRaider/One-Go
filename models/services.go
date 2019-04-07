@@ -10,8 +10,9 @@ func NewServices(connectionInfo string) (*Services, error) {
 	}
 	db.LogMode(true) // устанавливаем онэим ведения журнала (True для подробных ),(False - выводит ток ошибки )
 	return &Services{
-		User: NewUserService(db),
-		db:   db,
+		User:    NewUserService(db),
+		Gallery: NewGalleryService(db),
+		db:      db,
 	}, nil
 }
 
