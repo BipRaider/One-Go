@@ -31,9 +31,9 @@ func main() {
 	services, err := models.NewServices(mysqlinfo)
 	must(err, 3)
 
-	// defer us.Close()
-	// //us.DestructiveReset()
-	// us.AutoMigrate()
+	defer services.Close()
+	//services.DestructiveReset() // удаляет из бд
+	services.AutoMigrate() //записует в бд
 
 	r := mux.NewRouter() //1 begin
 

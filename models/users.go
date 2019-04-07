@@ -47,13 +47,6 @@ type UserDB interface {
 	Create(user *User) error
 	Update(user *User) error
 	Delete(id uint) error
-
-	// Used to close  a DB connectionInfo
-	Close() error
-
-	//Migration helpers
-	AutoMigrate() error
-	DestructiveReset() error
 }
 
 // UserService is a set of methods used to manipulate  and
@@ -444,26 +437,4 @@ func (ug *userGorm) Delete(id uint) error {
 		},
 	}
 	return ug.db.Delete(&user).Error
-}
-
-//Фнкция для closes the Service with database
-func (ug *userGorm) Close() error { return ug.db.Close() }
-
-//DestructiveReset drops the user table and rebuilds it
-func (ug *userGorm) DestructiveReset() error { // удалит таблицу если существует
-	if err := ug.db.DropTableIfExists(&User{}).Error; err != nil {
-		return err
-	}
-	return ug.AutoMigrate()
-
-}
-
-//AutoMigrate will attempt to autonatically migrate the
-//user table
-//Добовляет в базу данных нехватающих полей
-func (ug *userGorm) AutoMigrate() error {
-	if err := ug.db.AutoMigrate(&User{}).Error; err != nil {
-		return err
-	}
-	return nil
 }
