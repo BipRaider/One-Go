@@ -70,16 +70,13 @@ type UserService interface {
 	UserDB
 }
 
-func NewUserService(connectionInfo string) (UserService, error) {
-	ug, err := newUserGorm(connectionInfo)
-	if err != nil {
-		return nil, err
-	}
+func NewUserService(db *gorm.DB) UserService {
+	ug := &userGorm{db}
 	hmac := hash.NewHMAC(hmacSecretKey)
 	uv := newUserValidator(ug, hmac)
 	return &userService{
 		UserDB: uv,
-	}, nil
+	}
 }
 
 var _ UserService = &userService{}
@@ -365,19 +362,6 @@ func (uv *userValidator) passwordHashRequired(user *User) error {
 
 ///----------------------------------------------------------------------------------------------------------------------------
 var _ UserDB = &userGorm{}
-
-func newUserGorm(connectionInfo string) (*userGorm, error) {
-	//Соединение с базой данных  !!ВАЖНО ?parseTime=true  добисывать в конце если надо чтобы выводило время
-	db, err := gorm.Open("mysql", connectionInfo) //"root:alfadog1@/bipusdb?charset=utf8&parseTime=True&loc=Local"
-	if err != nil {
-		return nil, err
-	}
-	db.LogMode(true)
-
-	return &userGorm{
-		db: db,
-	}, nil
-}
 
 type userGorm struct {
 	db *gorm.DB

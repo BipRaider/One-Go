@@ -28,21 +28,17 @@ const (
 
 func main() {
 	//соединение сайта с базойданых
-	us, err := models.NewUserService(mysqlinfo)
+	services, err := models.NewServices(mysqlinfo)
 	must(err, 3)
-	defer us.Close()
-	//us.DestructiveReset()
-	us.AutoMigrate()
+
+	// defer us.Close()
+	// //us.DestructiveReset()
+	// us.AutoMigrate()
 
 	r := mux.NewRouter() //1 begin
 
-	// homeView = views.NewView("bootstrap", "views/home.gohtml")       //2
-	// conatctView = views.NewView("bootstrap", "views/contact.gohtml") //2
 	staticC := controllers.NewStatic()
-	usersC := controllers.NewUser(us) //2
-	// faqC := controllers.NewFAQ()
-
-	//https://www.gorillatoolkit.org/pkg/mux
+	usersC := controllers.NewUser(services.User) //2
 
 	NotF = views.NotFound()                        //2
 	r.NotFoundHandler = http.HandlerFunc(notFound) //3 //Заменили вид выводящейся ошибки на своё
@@ -65,6 +61,7 @@ func main() {
 	http.ListenAndServe(":3000", r) //end// это адрес сервера  куда будет отправляться данные
 }
 
+//https://www.gorillatoolkit.org/pkg/mux
 //http://localhost:3000/
 //https://getbootstrap.com/docs/3.3/components/#nav
 

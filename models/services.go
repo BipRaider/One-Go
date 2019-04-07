@@ -8,7 +8,10 @@ func NewServices(connectionInfo string) (*Services, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Services{}, nil
+	db.LogMode(true) // устанавливаем онэим ведения журнала (True для подробных ),(False - выводит ток ошибки )
+	return &Services{
+		User: NewUserService(db),
+	}, nil
 }
 
 type Services struct {
