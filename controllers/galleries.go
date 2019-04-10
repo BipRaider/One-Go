@@ -43,5 +43,4 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обра
 		return
 	}
 	fmt.Fprintln(w, gallery)
-
 }

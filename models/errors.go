@@ -7,10 +7,6 @@ const (
 	// in the database.
 	ErrNotFaund modelError = "models: resource not found"
 
-	//ErrInvalidI is returned when  an invalid ID is provided
-	// to a mathod like Delete.
-	ErrInvalidID modelError = "models: ID provided was invalid, must be > 0"
-
 	ErrInvalidEmail modelError = "models: invalid email address provided"
 
 	// ErrInvalidPassword is returned when an invalid password
@@ -37,13 +33,23 @@ const (
 	//without a user  password  provided.
 	ErrPasswordRequired modelError = "models: Passsword is required"
 
+	//ErrTitleRequired is returned when
+	ErrTitleRequired modelError = "models: Title is required"
+
+	//ErrInvalidI is returned when  an invalid ID is provided
+	// to a mathod like Delete.
+	ErrInvalidID privateError = "models: ID provided was invalid, must be > 0"
+
 	//ErrRememberTooShort is returned when a remember token is not
 	//at the least 32 bytes
-	ErrRememberTooShort modelError = "models: Remember token must be at bytes"
+	ErrRememberTooShort privateError = "models: Remember token must be at bytes"
 
 	// ErrRememberRequired is returned when an create or update is attempted
 	//without a valid user remember token hash.
-	ErrRememberRequired modelError = "models: Remember token is required"
+	ErrRememberRequired privateError = "models: Remember token is required"
+
+	//ErrUserIDRequired  is returned when
+	ErrUserIDRequired privateError = "models: User ID is required"
 )
 
 type modelError string
@@ -58,4 +64,11 @@ func (e modelError) Public() string {
 	split := strings.Split(s, " ")     // строку приобразовал в срез
 	split[0] = strings.Title(split[0]) // все первые буквы строк будут заглавные
 	return strings.Join(split, " ")    // обьеденили срез в одну строку   (первое срез , что вставлять между )
+}
+
+//-----------------
+type privateError string
+
+func (e privateError) Error() string {
+	return string(e)
 }
