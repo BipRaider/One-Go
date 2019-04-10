@@ -59,7 +59,7 @@ func main() {
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
 	//Gallery routes
 	r.Handle("/galleries/new", galleriesC.New).Methods("GET")
-	//r.HandleFunc("/galleries/new", galleriesC.Create).Methods("POST")
+	r.HandleFunc("/galleries", galleriesC.Create).Methods("POST")
 
 	fmt.Println("Starting the server on :3000...")
 	http.ListenAndServe(":3000", r) //end// это адрес сервера  куда будет отправляться данные
