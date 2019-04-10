@@ -38,11 +38,12 @@ func main() {
 	r := mux.NewRouter() //1 begin
 
 	staticC := controllers.NewStatic()
-	usersC := controllers.NewUser(services.User) //2
+	usersC := controllers.NewUser(services.User)
+	galleriesC := controllers.NewGalleries(services.Gallery)
 
 	NotF = views.NotFound()                        //2
 	r.NotFoundHandler = http.HandlerFunc(notFound) //3 //Заменили вид выводящейся ошибки на своё
-
+	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/home", staticC.Home).Methods("GET")       //3
 	r.Handle("/contact", staticC.Contact).Methods("GET") //3
 
@@ -56,6 +57,9 @@ func main() {
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
 
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
+	//Gallery routes
+	r.Handle("/galleries/new", galleriesC.New).Methods("GET")
+	//r.HandleFunc("/galleries/new", galleriesC.Create).Methods("POST")
 
 	fmt.Println("Starting the server on :3000...")
 	http.ListenAndServe(":3000", r) //end// это адрес сервера  куда будет отправляться данные
