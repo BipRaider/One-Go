@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"./controllers"
+	"./middleware"
 	"./models"
 	"./views"
 	"github.com/gorilla/mux"
@@ -40,7 +41,11 @@ func main() {
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUser(services.User)
 	galleriesC := controllers.NewGalleries(services.Gallery)
-
+	///-----------------
+	requireUserMw := middleware.RequireUser{
+		UserService: services.User, // запрос из БД, данные на пользователя
+	}
+	///------------
 	NotF = views.NotFound()                        //2
 	r.NotFoundHandler = http.HandlerFunc(notFound) //3 //Заменили вид выводящейся ошибки на своё
 	r.Handle("/", staticC.Home).Methods("GET")
@@ -58,8 +63,9 @@ func main() {
 
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
 	//Gallery routes
-	r.Handle("/galleries/new", galleriesC.New).Methods("GET")
-	r.HandleFunc("/galleries", galleriesC.Create).Methods("POST")
+
+	r.Handle("/galleries/new", requireUserMw.Apply(galleriesC.New)).Methods("GET")
+	r.HandleFunc("/galleries", requireUserMw.ApplyFn(galleriesC.Create)).Methods("POST")
 
 	fmt.Println("Starting the server on :3000...")
 	http.ListenAndServe(":3000", r) //end// это адрес сервера  куда будет отправляться данные
