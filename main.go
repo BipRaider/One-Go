@@ -51,16 +51,12 @@ func main() {
 	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/home", staticC.Home).Methods("GET")       //3
 	r.Handle("/contact", staticC.Contact).Methods("GET") //3
-
-	r.HandleFunc("/faq", usersC.NewFaqGet).Methods("GET")
-	r.HandleFunc("/faq", usersC.Create).Methods("POST")
-
 	r.Handle("/login", usersC.LoginView).Methods("GET")
 	r.HandleFunc("/login", usersC.Login).Methods("POST")
-
 	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
-
+	r.HandleFunc("/faq", usersC.NewFaqGet).Methods("GET")
+	r.HandleFunc("/faq", usersC.Create).Methods("POST")
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
 	//Gallery routes
 

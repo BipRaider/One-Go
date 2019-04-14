@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"../context"
 	"../models"
 	"../views"
 )
@@ -26,6 +27,7 @@ type GalleryForm struct {
 
 //POST /galleries
 func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обрабатывает в водимые данные в браузере
+
 	var vd views.Data
 	var form GalleryForm
 	if err := parseForm(r, &form); err != nil {
@@ -34,8 +36,15 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обра
 		g.New.Render(w, vd)
 		return
 	}
+	user := context.User(r.Context())
+	if user == nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+	fmt.Println("Create got the user", user)
 	gallery := models.Gallery{
-		Title: form.Title,
+		Title:  form.Title,
+		UserID: user.ID,
 	}
 	if err := g.gs.Create(&gallery); err != nil {
 		vd.SetAlert(err)
