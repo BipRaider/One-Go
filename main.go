@@ -12,9 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var (
-	NotF *views.View
-)
+var NotF *views.View
 
 func notFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -40,7 +38,7 @@ func main() {
 
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUser(services.User)
-	galleriesC := controllers.NewGalleries(services.Gallery)
+	galleriesC := controllers.NewGalleries(services.Gallery, r)
 	///-----------------
 	requireUserMw := middleware.RequireUser{
 		UserService: services.User, // запрос из БД, данные на пользователя
@@ -62,9 +60,11 @@ func main() {
 
 	r.Handle("/galleries/new", requireUserMw.Apply(galleriesC.New)).Methods("GET")
 	r.HandleFunc("/galleries", requireUserMw.ApplyFn(galleriesC.Create)).Methods("POST")
+	r.HandleFunc("/galleries/{id:[0-9]+}", galleriesC.Show).Methods("GET").Name(controllers.ShowGallery)
 
 	fmt.Println("Starting the server on :3000...")
 	http.ListenAndServe(":3000", r) //end// это адрес сервера  куда будет отправляться данные
+
 }
 
 //https://www.gorillatoolkit.org/pkg/mux

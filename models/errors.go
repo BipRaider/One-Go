@@ -1,6 +1,8 @@
 package models
 
-import "strings"
+import (
+	"strings"
+)
 
 const (
 	//ErrNorFound is returned when a resource cannot be found

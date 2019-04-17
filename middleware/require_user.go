@@ -1,7 +1,7 @@
 package middleware
 
+///Требования к юзеру на афторизацию тд
 import (
-	"fmt"
 	"net/http"
 
 	"../context"
@@ -34,10 +34,18 @@ func (mw *RequireUser) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
-		ctx := r.Context()
-		ctx = context.WithUser(ctx, user)
+		// Get the context from our request
+		ctx := r.Context() // This is how we get a request's context
+
+		// Create a new context from the existing one that has
+		// our user stored in it with the private user key
+		ctx = context.WithUser(ctx, user) // отправка данных в контекс
+
+		// Create a new request from the existing one with our
+		// context attached to it and assign it back to `r`.
 		r = r.WithContext(ctx)
-		fmt.Println("User found:", user)
+
+		// Call next(w, r) with our updated context.
 		next(w, r)
 	})
 }

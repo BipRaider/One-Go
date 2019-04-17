@@ -4,25 +4,64 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"../context"
 	"../models"
 	"../views"
+	"github.com/gorilla/mux"
 )
 
-func NewGalleries(gs models.GalleryService) *Galleries {
+const (
+	ShowGallery = "show_gallery"
+)
+
+func NewGalleries(gs models.GalleryService, mr *mux.Router) *Galleries {
 	return &Galleries{
-		New: views.NewView(bs, "galleries/new"),
-		gs:  gs,
+		New:      views.NewView(bs, "galleries/new"),
+		ShowView: views.NewView(bs, "galleries/show"),
+		gs:       gs,
+		r:        mr,
 	}
 }
 
 type Galleries struct {
-	New *views.View
-	gs  models.GalleryService
+	New      *views.View
+	ShowView *views.View
+	gs       models.GalleryService
+	r        *mux.Router
 }
+
+//
 type GalleryForm struct {
 	Title string `schema:"title"`
+}
+
+// переходи по сылка по в "/galleries/{id:[0-9]+}"
+//Get /galleries/:id
+func (g *Galleries) Show(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	idStr := vars["id"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid gallery ID", http.StatusNotFound)
+		return
+	}
+	gallery, err := g.gs.ByID(uint(id))
+	if err != nil {
+		switch err {
+		case models.ErrNotFaund:
+			http.Error(w, "Gallery not found", http.StatusNotFound)
+		default:
+			http.Error(w, "Whoooops!!!  Something went wrong", http.StatusInternalServerError)
+		}
+		return
+	}
+	var vd views.Data
+	vd.Yield = gallery
+	g.ShowView.Render(w, vd)
+
 }
 
 //POST /galleries
@@ -36,12 +75,13 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обра
 		g.New.Render(w, vd)
 		return
 	}
+	// This is our new code
 	user := context.User(r.Context())
 	if user == nil {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
-	fmt.Println("Create got the user", user)
+
 	gallery := models.Gallery{
 		Title:  form.Title,
 		UserID: user.ID,
@@ -51,5 +91,12 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обра
 		g.New.Render(w, vd)
 		return
 	}
-	fmt.Fprintln(w, gallery)
+	url, err := g.r.Get(ShowGallery).URL("id", fmt.Sprintf("%v", gallery.ID))
+	if err != nil {
+		//TODO: Make this go to the index page
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+	http.Redirect(w, r, url.Path, http.StatusFound)
+
 }

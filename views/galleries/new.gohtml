@@ -20,8 +20,8 @@
 {{define "galleryForm"}}
 <form action="/galleries" method="POST">
   <div class="form-group">
-    <label for="title">Title</label>
-    <input type="text" name="title" class="form-control" id="title" placeholder="What is the title of your gallery?">
+    <label for="title">Title</label><!--type GalleryForm struct-->
+    <input type="text" name="title" class="form-control" id="title" placeholder="What is the title of your gallery?"> <!--type GalleryForm struct-->
   </div>
   
   <button type="submit" class="btn btn-info">Create</button>

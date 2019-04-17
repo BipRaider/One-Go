@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/schema"
 )
 
-// функция  обработки в водимых данных user an faq
+// функция  обработки в водимых данных user
 func parseForm(r *http.Request, dst interface{}) error {
 
 	if err := r.ParseForm(); err != nil {
