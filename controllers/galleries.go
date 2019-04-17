@@ -34,14 +34,14 @@ type Galleries struct {
 
 //
 type GalleryForm struct {
-	Title string `schema:"title"`
+	Title string `schema:"title"` // тип даных что в водеться в браузере  и берется из gallery/new.gohtml для передачи в функций
 }
 
 // переходи по сылка по в "/galleries/{id:[0-9]+}"
 //Get /galleries/:id
 func (g *Galleries) Show(w http.ResponseWriter, r *http.Request) {
 
-	vars := mux.Vars(r)
+	vars := mux.Vars(r) //Vars возвращает переменные маршрута для текущего запроса, если таковые имеются.
 	idStr := vars["id"]
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -83,8 +83,8 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обра
 	}
 
 	gallery := models.Gallery{
-		Title:  form.Title,
-		UserID: user.ID,
+		Title:  form.Title, //  отправить строку для записи в базу данных из в вода на на странице браузера
+		UserID: user.ID,    // запишит номер id user in DB
 	}
 	if err := g.gs.Create(&gallery); err != nil {
 		vd.SetAlert(err)
