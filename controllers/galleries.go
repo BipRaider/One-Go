@@ -21,8 +21,9 @@ func NewGalleries(gs models.GalleryService, mr *mux.Router) *Galleries {
 		New:      views.NewView(bs, "galleries/new"),
 		ShowView: views.NewView(bs, "galleries/show"),
 		EditView: views.NewView(bs, "galleries/edit"),
-		gs:       gs,
-		r:        mr,
+
+		gs: gs,
+		r:  mr,
 	}
 }
 
@@ -65,12 +66,36 @@ func (g *Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	}
 	user := context.User(r.Context())
 	if gallery.UserID != user.ID {
-		http.Error(w, "Gallery not found edit", http.StatusNotFound)
+		http.Error(w, "Gallery not found  for edit", http.StatusNotFound)
 		return
 	}
 	var vd views.Data
 	vd.Yield = gallery
 	g.EditView.Render(w, vd)
+}
+
+//POST/galleries/:id/update
+func (g *Galleries) Update(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
+		return
+	}
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "Gallery not found  for update", http.StatusNotFound)
+		return
+	}
+	var vd views.Data
+	vd.Yield = gallery
+	var form GalleryForm
+	if err := parseForm(r, &form); err != nil {
+		log.Println(err)
+		vd.SetAlert(err)
+		g.EditView.Render(w, vd)
+		return
+	}
+	gallery.Title = form.Title
+	fmt.Fprintln(w, gallery)
 }
 
 //POST /galleries
