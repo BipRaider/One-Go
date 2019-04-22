@@ -20,6 +20,7 @@ func NewGalleries(gs models.GalleryService, mr *mux.Router) *Galleries {
 	return &Galleries{
 		New:      views.NewView(bs, "galleries/new"),
 		ShowView: views.NewView(bs, "galleries/show"),
+		EditView: views.NewView(bs, "galleries/edit"),
 		gs:       gs,
 		r:        mr,
 	}
@@ -28,6 +29,7 @@ func NewGalleries(gs models.GalleryService, mr *mux.Router) *Galleries {
 type Galleries struct {
 	New      *views.View
 	ShowView *views.View
+	EditView *views.View
 	gs       models.GalleryService
 	r        *mux.Router
 }
@@ -40,28 +42,35 @@ type GalleryForm struct {
 // переходи по сылка по в "/galleries/{id:[0-9]+}"
 //Get /galleries/:id
 func (g *Galleries) Show(w http.ResponseWriter, r *http.Request) {
-
-	vars := mux.Vars(r) //Vars возвращает переменные маршрута для текущего запроса, если таковые имеются.
-	idStr := vars["id"]
-	id, err := strconv.Atoi(idStr)
+	gallery, err := g.galleryByID(w, r)
 	if err != nil {
-		http.Error(w, "Invalid gallery ID", http.StatusNotFound)
 		return
 	}
-	gallery, err := g.gs.ByID(uint(id))
-	if err != nil {
-		switch err {
-		case models.ErrNotFaund:
-			http.Error(w, "Gallery not found", http.StatusNotFound)
-		default:
-			http.Error(w, "Whoooops!!!  Something went wrong", http.StatusInternalServerError)
-		}
-		return
-	}
+	// Мы создадим объект views.Data и установим нашу галерею
+	// как поле Yield, но технически нам не нужно
+	// делать это и просто передать галерею в
+	// Визуализация метода из-за переключателя типа, который мы закодировали в
+	// метод Render.
 	var vd views.Data
 	vd.Yield = gallery
 	g.ShowView.Render(w, vd)
 
+}
+
+//Get /galleries/:id/edit  // переходим на строничку для редакций  данных в галерей  по айди юзира
+func (g *Galleries) Edit(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
+		return
+	}
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "Gallery not found edit", http.StatusNotFound)
+		return
+	}
+	var vd views.Data
+	vd.Yield = gallery
+	g.EditView.Render(w, vd)
 }
 
 //POST /galleries
@@ -99,4 +108,27 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обра
 	}
 	http.Redirect(w, r, url.Path, http.StatusFound)
 
+}
+
+// используется для индефикаций по id user
+func (g *Galleries) galleryByID(w http.ResponseWriter, r *http.Request) (*models.Gallery, error) {
+	vars := mux.Vars(r) //Vars возвращает переменные маршрута для текущего запроса, если таковые имеются.
+	idStr := vars["id"] // Далее нам нужно получить переменную "id" из наших переменных.
+
+	id, err := strconv.Atoi(idStr) // Наш idStr является строкой, поэтому мы используем функцию Atoi предоставляется пакетом strconv для преобразования его в целое число
+	if err != nil {                // Эта функция также может возвращать ошибку, поэтому нам
+		http.Error(w, "Invalid gallery ID", http.StatusNotFound) // нужно проверить на наличие ошибок и отобразить ошибку.
+		return nil, err
+	}
+	gallery, err := g.gs.ByID(uint(id))
+	if err != nil {
+		switch err {
+		case models.ErrNotFaund:
+			http.Error(w, "Gallery not found", http.StatusNotFound)
+		default:
+			http.Error(w, "Whoooops!!!  Something went wrong", http.StatusInternalServerError)
+		}
+		return nil, err
+	}
+	return gallery, nil
 }

@@ -82,6 +82,7 @@ type galleryGorm struct {
 	db *gorm.DB
 }
 
+//
 func (gg *galleryGorm) ByID(id uint) (*Gallery, error) {
 	var gallery Gallery
 	db := gg.db.Where("id = ? ", id)
