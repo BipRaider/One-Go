@@ -71,7 +71,7 @@ func (g *Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	}
 	var vd views.Data
 	vd.Yield = gallery
-	g.EditView.Render(w, vd)
+	g.EditView.Render(w, vd) ////вывод данных на экран
 }
 
 //POST/galleries/:id/update
@@ -91,11 +91,24 @@ func (g *Galleries) Update(w http.ResponseWriter, r *http.Request) {
 	if err := parseForm(r, &form); err != nil {
 		log.Println(err)
 		vd.SetAlert(err)
+		g.EditView.Render(w, vd) ////вывод данных на экран
+		return
+	}
+	// в водимые даные перезаписываем в базу данных
+	gallery.Title = form.Title
+	err = g.gs.Update(gallery)
+	if err != nil {
+		vd.SetAlert(err)
 		g.EditView.Render(w, vd)
 		return
 	}
-	gallery.Title = form.Title
-	fmt.Fprintln(w, gallery)
+	// выводит на экран зеленую надпись что галереея обнавилась
+	vd.Alert = &views.Alert{
+		Level:   views.AlertLvlSuccess,
+		Message: "Gallery succesfully update",
+	}
+	//вывод данных на экран
+	g.EditView.Render(w, vd)
 }
 
 //POST /galleries
