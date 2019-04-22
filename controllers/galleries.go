@@ -75,6 +75,7 @@ func (g *Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 }
 
 //POST/galleries/:id/update
+//Обновлен сервис галереи, чтобы включить метод обновления, и подключил его к действию обновления галерей
 func (g *Galleries) Update(w http.ResponseWriter, r *http.Request) {
 	gallery, err := g.galleryByID(w, r)
 	if err != nil {
@@ -146,6 +147,30 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обра
 	}
 	http.Redirect(w, r, url.Path, http.StatusFound)
 
+}
+
+///____________________________________________
+//POST/galleries/:id/delete
+func (g *Galleries) Delete(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
+		return
+	}
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "Gallery not found  for delete", http.StatusNotFound)
+		return
+	}
+	var vd views.Data
+	err = g.gs.Delete(gallery.ID)
+	if err != nil {
+		vd.SetAlert(err)
+		vd.Yield = gallery
+		g.EditView.Render(w, vd)
+		return
+	}
+	//TODO : Redirect to index page
+	fmt.Fprintln(w, "successfull deleted!")
 }
 
 // используется для индефикаций по id user
