@@ -26,7 +26,7 @@ type Services struct {
 func (s *Services) Close() error { return s.db.Close() }
 
 //DestructiveReset drops all tables and rebuilds them
-func (s *Services) DestructiveReset() error { // удалит таблицу если существует
+func (s *Services) DestructiveReset() error { // удалит таблиц если существует
 	err := s.db.DropTableIfExists(&User{}, &Gallery{}).Error
 	if err != nil {
 		return err

@@ -14,13 +14,15 @@ import (
 
 const (
 	ShowGallery = "show_gallery"
+	EditGallery = "edit_gallery"
 )
 
 func NewGalleries(gs models.GalleryService, mr *mux.Router) *Galleries {
 	return &Galleries{
-		New:      views.NewView(bs, "galleries/new"),
-		ShowView: views.NewView(bs, "galleries/show"),
-		EditView: views.NewView(bs, "galleries/edit"),
+		New:       views.NewView(bs, "galleries/new"),
+		ShowView:  views.NewView(bs, "galleries/show"),
+		EditView:  views.NewView(bs, "galleries/edit"),
+		IndexView: views.NewView(bs, "galleries/index"),
 
 		gs: gs,
 		r:  mr,
@@ -28,16 +30,31 @@ func NewGalleries(gs models.GalleryService, mr *mux.Router) *Galleries {
 }
 
 type Galleries struct {
-	New      *views.View
-	ShowView *views.View
-	EditView *views.View
-	gs       models.GalleryService
-	r        *mux.Router
+	New       *views.View
+	ShowView  *views.View
+	EditView  *views.View
+	IndexView *views.View
+
+	gs models.GalleryService
+	r  *mux.Router
 }
 
 //
 type GalleryForm struct {
 	Title string `schema:"title"` // тип даных что в водеться в браузере  и берется из gallery/new.gohtml для передачи в функций
+}
+
+//Get /galleries
+func (g *Galleries) Index(w http.ResponseWriter, r *http.Request) {
+	user := context.User(r.Context())
+	galleries, err := g.gs.ByUserID(user.ID)
+	if err != nil {
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+	var vd views.Data
+	vd.Yield = galleries
+	g.IndexView.Render(w, vd) ////вывод данных на экран
 }
 
 // переходи по сылка по в "/galleries/{id:[0-9]+}"
@@ -58,7 +75,7 @@ func (g *Galleries) Show(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//Get /galleries/:id/edit  // переходим на строничку для редакций  данных в галерей  по айди юзира
+//GET /galleries/:id/edit  // переходим на строничку для редакций  данных в галерей  по айди юзира
 func (g *Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	gallery, err := g.galleryByID(w, r)
 	if err != nil {
@@ -139,7 +156,7 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обра
 		g.New.Render(w, vd)
 		return
 	}
-	url, err := g.r.Get(ShowGallery).URL("id", fmt.Sprintf("%v", gallery.ID))
+	url, err := g.r.Get(EditGallery).URL("id", fmt.Sprintf("%v", gallery.ID))
 	if err != nil {
 		//TODO: Make this go to the index page
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -169,8 +186,7 @@ func (g *Galleries) Delete(w http.ResponseWriter, r *http.Request) {
 		g.EditView.Render(w, vd)
 		return
 	}
-	//TODO : Redirect to index page
-	fmt.Fprintln(w, "successfull deleted!")
+	http.Redirect(w, r, "/galleries", http.StatusFound) // перенаправит на страницу  "/galleries"
 }
 
 // используется для индефикаций по id user
