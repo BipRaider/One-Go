@@ -17,7 +17,7 @@ var NotF *views.View
 func notFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusNotFound)
-	NotF.Render(w, nil)
+	NotF.Render(w, r, nil)
 
 }
 
@@ -26,7 +26,7 @@ const (
 )
 
 func main() {
-	//соединение сайта с базойданых
+	//соединение с базойданых
 	services, err := models.NewServices(mysqlinfo)
 	must(err, 3)
 
@@ -40,8 +40,11 @@ func main() {
 	usersC := controllers.NewUser(services.User)
 	galleriesC := controllers.NewGalleries(services.Gallery, r)
 	///-----------------
-	requireUserMw := middleware.RequireUser{
+	userMw := middleware.User{
 		UserService: services.User, // запрос из БД, данные на пользователя
+	}
+	requireUserMw := middleware.RequireUser{
+		User: userMw,
 	}
 	///------------
 	NotF = views.NotFound()                        //2
@@ -53,9 +56,7 @@ func main() {
 	r.HandleFunc("/login", usersC.Login).Methods("POST")
 	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
-	r.HandleFunc("/faq", usersC.NewFaqGet).Methods("GET")
-	r.HandleFunc("/faq", usersC.Create).Methods("POST")
-	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
+
 	//Gallery routes
 	r.Handle("/galleries", requireUserMw.ApplyFn(galleriesC.Index)).Methods("GET")
 	r.Handle("/galleries/new", requireUserMw.Apply(galleriesC.New)).Methods("GET")
@@ -67,7 +68,7 @@ func main() {
 	r.HandleFunc("/galleries/{id:[0-9]+}", galleriesC.Show).Methods("GET").Name(controllers.ShowGallery)
 
 	fmt.Println("Starting the server on :3000...")
-	http.ListenAndServe(":3000", r) //end// это адрес сервера  куда будет отправляться данные
+	http.ListenAndServe(":3000", userMw.Apply(r)) //end// это адрес сервера  куда будет отправляться данные
 
 }
 

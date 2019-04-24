@@ -16,14 +16,17 @@
       <ul class="nav navbar-nav">
         <li><a href="/home">Home <span class="sr-only">(current)</span></a></li>
         <li><a href="/contact">Contact</a></li>
+        {{if .User}}<!--- при открывания данной страницы в navbar добавится сылка на Galleries -->
+          <li><a href="/galleries">Galleries</a></li>
+        {{end}}
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="/galleries">Gallery</a></li>
         <li><a href="/signup">Sing Up</a></li>
         <li><a href="/login">Log In</a></li>  
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
+
 {{end}}

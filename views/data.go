@@ -1,5 +1,9 @@
 package views
 
+import (
+	"../models"
+)
+
 const (
 	AlertLvlError   = "danger"
 	AlertLvlWarning = "warning"
@@ -21,6 +25,7 @@ type Alert struct {
 // Data is the top leval structure that views expect data
 type Data struct {
 	Alert *Alert
+	User  *models.User
 	Yield interface{}
 }
 

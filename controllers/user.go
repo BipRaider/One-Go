@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -15,7 +14,6 @@ const bs string = "bootstrap"
 func NewUser(us models.UserService) *Users {
 	return &Users{
 		NewView:   views.NewView(bs, "users/new"),
-		NewFaq:    views.NewView(bs, "users/faq"),
 		LoginView: views.NewView(bs, "users/login"),
 		us:        us,
 	}
@@ -23,7 +21,6 @@ func NewUser(us models.UserService) *Users {
 
 type Users struct {
 	NewView   *views.View
-	NewFaq    *views.View
 	LoginView *views.View
 	us        models.UserService
 }
@@ -51,21 +48,17 @@ type Users struct {
 // GET /signup
 
 func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабатывает Html шаблоны и вывоодит в браузер .
-	u.NewView.Render(w, nil)
+	u.NewView.Render(w, r, nil)
 }
 
 //This is used to render the form where  can create
 // a new FAQ message
 // GET /signup
-func (u *Users) NewFaqGet(w http.ResponseWriter, r *http.Request) {
-	u.NewFaq.Render(w, nil)
-}
 
 type SignupForm struct {
 	Name     string `schema:"name"`
 	Email    string `schema:"email"`
 	Password string `schema:"password"`
-	Quastion string `schema:"faq"`
 }
 
 //This is used to process the sign up form when a user tries to
@@ -82,7 +75,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 	if err := parseForm(r, &form); err != nil {
 		log.Println(err)
 		vd.SetAlert(err)
-		u.NewView.Render(w, vd)
+		u.NewView.Render(w, r, vd)
 		return
 	}
 	user := models.User{
@@ -92,7 +85,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 	}
 	if err := u.us.Create(&user); err != nil {
 		vd.SetAlert(err)
-		u.NewView.Render(w, vd)
+		u.NewView.Render(w, r, vd)
 		return
 	}
 	err := u.signIn(w, &user)
@@ -101,7 +94,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 		return
 	}
 
-	http.Redirect(w, r, "/cookietest", http.StatusFound)
+	http.Redirect(w, r, "/galleries", http.StatusFound)
 
 	//-----1.1---1.2---
 	// if err := r.ParseForm(); err != nil { //----1.1----
@@ -137,7 +130,7 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 	if err := parseForm(r, &form); err != nil {
 		log.Println(err)
 		vd.SetAlert(err)
-		u.LoginView.Render(w, vd)
+		u.LoginView.Render(w, r, vd)
 		return
 	}
 	user, err := u.us.Authenticate(form.Email, form.Password)
@@ -148,16 +141,16 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 		default:
 			vd.SetAlert(err)
 		}
-		u.LoginView.Render(w, vd)
+		u.LoginView.Render(w, r, vd)
 		return
 	}
 	err = u.signIn(w, user)
 	if err != nil {
 		vd.SetAlert(err)
-		u.LoginView.Render(w, vd)
+		u.LoginView.Render(w, r, vd)
 		return
 	}
-	http.Redirect(w, r, "/cookietest", http.StatusFound)
+	http.Redirect(w, r, "/galleries", http.StatusFound)
 }
 
 //signIn is used to sign the given user  in via cookies
@@ -182,22 +175,6 @@ func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
 	}
 	http.SetCookie(w, &cookie)
 	return nil
-}
-
-//CookieTest is used to display cookies set on the current user
-func (u *Users) CookieTest(w http.ResponseWriter, r *http.Request) {
-	cookei, err := r.Cookie("remember_token")
-	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	}
-	user, err := u.us.ByRemember(cookei.Value)
-	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	}
-	fmt.Fprintln(w, user)
-
 }
 
 //https://github.com/gorilla/mux

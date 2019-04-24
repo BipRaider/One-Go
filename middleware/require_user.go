@@ -8,30 +8,24 @@ import (
 	"../models"
 )
 
-type RequireUser struct {
+type User struct {
 	models.UserService
 }
 
-func (mw *RequireUser) Apply(next http.Handler) http.HandlerFunc {
+func (mw *User) Apply(next http.Handler) http.HandlerFunc {
 	return mw.ApplyFn(next.ServeHTTP)
 }
-
-// ApplyFn will return an http.HandlerFunc that will
-// check to see if a user is logged in and then either
-// call next(w, r) if they are, or redirect them to the
-// login page if they are not.
-
-func (mw *RequireUser) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
+func (mw *User) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookei, err := r.Cookie("remember_token") // если пользователь не зарегестрирован(нету куки) то перенаправляет на регистрацию
 		if err != nil {
-			http.Redirect(w, r, "/login", http.StatusFound)
+			next(w, r)
 			return
 		}
 		user, err := mw.UserService.ByRemember(cookei.Value)
 		if err != nil {
-			http.Redirect(w, r, "/login", http.StatusFound)
+			next(w, r)
 			return
 		}
 		// Get the context from our request
@@ -46,6 +40,40 @@ func (mw *RequireUser) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 		r = r.WithContext(ctx)
 
 		// Call next(w, r) with our updated context.
+		next(w, r)
+	})
+}
+
+///-------------------------------------------------------------
+//RequireUser assumes that User middleware has already been run
+//otherwise it will not work  correctly.
+type RequireUser struct {
+	User
+}
+
+//Apply  assumes that User middleware has already been run
+//otherwise it will not work  correctly.
+func (mw *RequireUser) Apply(next http.Handler) http.HandlerFunc {
+	return mw.ApplyFn(next.ServeHTTP)
+}
+
+// ApplyFn will return an http.HandlerFunc that will
+// check to see if a user is logged in and then either
+// call next(w, r) if they are, or redirect them to the
+// login page if they are not.
+
+//ApplyFn  assumes that User middleware has already been run
+//otherwise it will not work  correctly.
+// работает с индефецированым пользователем и обрабатывает все функций с этим индефецированым пользователем
+// если пользователь не индефецирован отправляет на страничку логина
+func (mw *RequireUser) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := context.User(r.Context())
+		if user == nil {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
 		next(w, r)
 	})
 }

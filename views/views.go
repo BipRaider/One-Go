@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"../context"
 )
 
 type View struct {
@@ -75,24 +77,28 @@ func addTemlateExt(files []string) { //Добавит ".gohml"
 
 //Функция  которая выводит в браузер нужную файл и какого шаблона , 1.2.1
 func (v *View) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	v.Render(w, nil)
+	v.Render(w, r, nil)
 }
 
 // Функция  которая выводит в браузер нужную файл и какого шаблона , 1.2
 //Render is used to render the viewwith the predefind layout
-func (v *View) Render(w http.ResponseWriter, data interface{}) {
+func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8") // надо указывать кодировку ;charset=utf-8
-	switch data.(type) {
+	var vd Data
+	switch d := data.(type) {
 	case Data:
+		vd = d
 		// do nothing
 	default:
-		data = Data{
+		vd = Data{
 			Yield: data,
 		}
 	}
 
+	vd.User = context.User(r.Context())
+
 	var buf bytes.Buffer
-	if err := v.Template.ExecuteTemplate(&buf, v.Layout, data); err != nil {
+	if err := v.Template.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
 		http.Error(w, "Something went wrong. If the problem  persists , please email support@thebipus.com ", http.StatusInternalServerError)
 		return
 	}
@@ -107,7 +113,7 @@ func NotFound() *View {
 	files = append(files, layoutFiles()...)
 	t, err := template.ParseFiles(files...)
 	if err != nil {
-		os.Exit(6)
+		os.Exit(404)
 	}
 	return &View{
 		Template: t,
