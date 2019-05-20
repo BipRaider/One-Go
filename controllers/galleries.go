@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"../context"
@@ -15,6 +17,8 @@ import (
 const (
 	ShowGallery = "show_gallery"
 	EditGallery = "edit_gallery"
+
+	maxMultipartMem = 1 << 20 //1 megabyte
 )
 
 func NewGalleries(gs models.GalleryService, mr *mux.Router) *Galleries {
@@ -163,6 +167,69 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обра
 		return
 	}
 	http.Redirect(w, r, url.Path, http.StatusFound)
+
+}
+
+///----
+//POST/galleries/:id/images
+//Обновлен сервис галереи, чтобы включить метод обновления, и подключил его к действию обновления галерей
+func (g *Galleries) ImageUpload(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
+		return
+	}
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "Gallery not found  for update", http.StatusNotFound)
+		return
+	}
+	//TODO : Parse a multipart form
+	var vd views.Data
+	vd.Yield = gallery
+	err = r.ParseMultipartForm(maxMultipartMem)
+	if err != nil {
+		vd.SetAlert(err)            // выбор и передачи  ошибки
+		g.EditView.Render(w, r, vd) //вывод данных на экран
+		return
+	}
+	//Create the directory to contain our images
+	galleryPath := fmt.Sprintf("images/galleries/%v/", gallery.ID)
+	err = os.MkdirAll(galleryPath, 0755) //MkdirAll создает каталог с именем path(путь) вместе со всеми необходимыми родителями и возвращает nil
+	if err != nil {
+		vd.SetAlert(err)            // выбор и передачи  ошибки
+		g.EditView.Render(w, r, vd) //вывод данных на экран
+		return
+	}
+
+	files := r.MultipartForm.File["images"] // по имени ключа с html
+	for _, f := range files {
+		//Open the uploaded file
+		file, err := f.Open()
+		if err != nil {
+			vd.SetAlert(err)            // выбор и передачи  ошибки
+			g.EditView.Render(w, r, vd) //вывод данных на экран
+			return
+		}
+		defer file.Close() // в конце закрываем открытый файл
+
+		//Create a destination file
+		dst, err := os.Create(galleryPath + f.Filename)
+		if err != nil {
+			vd.SetAlert(err)            // выбор и передачи  ошибки
+			g.EditView.Render(w, r, vd) //вывод данных на экран
+			return
+		}
+		defer dst.Close()
+		//Copy uploaded file data to the destination
+		_, err = io.Copy(dst, file) // копируем данные в dst
+		if err != nil {
+			vd.SetAlert(err)            // выбор и передачи  ошибки
+			g.EditView.Render(w, r, vd) //вывод данных на экран
+			return
+		}
+	}
+
+	fmt.Fprintln(w, "Files successfully uploaded!")
 
 }
 

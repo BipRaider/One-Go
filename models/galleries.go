@@ -26,21 +26,22 @@ type GalleryDB interface {
 }
 
 //--------------------------------------------------------------------------------
+
+type galleryService struct {
+	GalleryDB
+}
+
 func NewGalleryService(db *gorm.DB) GalleryService {
 	return &galleryService{
 		GalleryDB: &galleryValidator{&galleryGorm{db}},
 	}
 }
 
-type galleryService struct {
-	GalleryDB
-}
-
+///-----------------------------------------
 type galleryValidator struct {
 	GalleryDB
 }
 
-///-----------------------------------------
 type galleryValFunc func(*Gallery) error
 
 //проверяет на ошибкию если есть ошибки выводит их в браузере
