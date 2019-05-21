@@ -2,10 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"../context"
@@ -21,7 +19,7 @@ const (
 	maxMultipartMem = 1 << 20 //1 megabyte
 )
 
-func NewGalleries(gs models.GalleryService, mr *mux.Router) *Galleries {
+func NewGalleries(gs models.GalleryService, is models.ImageService, r *mux.Router) *Galleries {
 	return &Galleries{
 		New:       views.NewView(bs, "galleries/new"),
 		ShowView:  views.NewView(bs, "galleries/show"),
@@ -29,7 +27,8 @@ func NewGalleries(gs models.GalleryService, mr *mux.Router) *Galleries {
 		IndexView: views.NewView(bs, "galleries/index"),
 
 		gs: gs,
-		r:  mr,
+		is: is,
+		r:  r,
 	}
 }
 
@@ -40,6 +39,7 @@ type Galleries struct {
 	IndexView *views.View
 
 	gs models.GalleryService
+	is models.ImageService
 	r  *mux.Router
 }
 
@@ -174,11 +174,11 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) { // Обра
 //POST/galleries/:id/images
 //Обновлен сервис галереи, чтобы включить метод обновления, и подключил его к действию обновления галерей
 func (g *Galleries) ImageUpload(w http.ResponseWriter, r *http.Request) {
-	gallery, err := g.galleryByID(w, r)
+	gallery, err := g.galleryByID(w, r) // используется для индефикаций по id user
 	if err != nil {
 		return
 	}
-	user := context.User(r.Context())
+	user := context.User(r.Context()) // Используеться как афтаризация для всех страниц.
 	if gallery.UserID != user.ID {
 		http.Error(w, "Gallery not found  for update", http.StatusNotFound)
 		return
@@ -186,15 +186,7 @@ func (g *Galleries) ImageUpload(w http.ResponseWriter, r *http.Request) {
 	//TODO : Parse a multipart form
 	var vd views.Data
 	vd.Yield = gallery
-	err = r.ParseMultipartForm(maxMultipartMem)
-	if err != nil {
-		vd.SetAlert(err)            // выбор и передачи  ошибки
-		g.EditView.Render(w, r, vd) //вывод данных на экран
-		return
-	}
-	//Create the directory to contain our images
-	galleryPath := fmt.Sprintf("images/galleries/%v/", gallery.ID)
-	err = os.MkdirAll(galleryPath, 0755) //MkdirAll создает каталог с именем path(путь) вместе со всеми необходимыми родителями и возвращает nil
+	err = r.ParseMultipartForm(maxMultipartMem) // указываем размеры загружаемых файлов
 	if err != nil {
 		vd.SetAlert(err)            // выбор и передачи  ошибки
 		g.EditView.Render(w, r, vd) //вывод данных на экран
@@ -212,23 +204,13 @@ func (g *Galleries) ImageUpload(w http.ResponseWriter, r *http.Request) {
 		}
 		defer file.Close() // в конце закрываем открытый файл
 
-		//Create a destination file
-		dst, err := os.Create(galleryPath + f.Filename)
-		if err != nil {
-			vd.SetAlert(err)            // выбор и передачи  ошибки
-			g.EditView.Render(w, r, vd) //вывод данных на экран
-			return
-		}
-		defer dst.Close()
-		//Copy uploaded file data to the destination
-		_, err = io.Copy(dst, file) // копируем данные в dst
+		err = g.is.Create(gallery.ID, file, f.Filename)
 		if err != nil {
 			vd.SetAlert(err)            // выбор и передачи  ошибки
 			g.EditView.Render(w, r, vd) //вывод данных на экран
 			return
 		}
 	}
-
 	fmt.Fprintln(w, "Files successfully uploaded!")
 
 }

@@ -18,6 +18,7 @@ func WithUser(ctx context.Context, user *models.User) context.Context {
 	return context.WithValue(ctx, userKey, user) // отправка данных в контекс
 }
 
+// Используеться как афтаризация для всех страниц.
 func User(ctx context.Context) *models.User {
 	if temp := ctx.Value(userKey); temp != nil { // Получить значение, хранящееся в userKye /// Retrieve the value stored at "my-key"
 		if user, ok := temp.(*models.User); ok { // type conversion !

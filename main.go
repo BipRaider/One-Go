@@ -38,7 +38,7 @@ func main() {
 
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUser(services.User)
-	galleriesC := controllers.NewGalleries(services.Gallery, r)
+	galleriesC := controllers.NewGalleries(services.Gallery, services.Image, r)
 	///-----------------
 	userMw := middleware.User{
 		UserService: services.User, // запрос из БД, данные на пользователя
