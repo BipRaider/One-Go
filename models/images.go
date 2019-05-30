@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 type ImageService interface {
 	Create(galleryID uint, r io.ReadCloser, filename string) error
-	//ByGallleryID(galleryID uint) []string
+	ByGalleryID(galleryID uint) ([]string, error)
 }
 
 //--------------------------------------------------------------------------------
@@ -42,11 +44,30 @@ func (is *imageService) Create(galleryID uint, r io.ReadCloser, filename string)
 	return nil
 }
 
+func (is *imageService) ByGalleryID(galleryID uint) ([]string, error) {
+	pathImage := is.imagePath(galleryID)
+	files, err := filepath.Glob(pathImage + "*")
+	if err != nil {
+		panic(err)
+	}
+	var filesPath []string
+	for _, str := range files {
+		str = strings.Replace(str, "\\", "/", -1)
+		filesPath = append(filesPath, str)
+	}
+
+	return filesPath, nil
+}
+
+func (is *imageService) imagePath(galleryID uint) string {
+	return fmt.Sprintf("images/galleries/%v/", galleryID)
+}
+
 //Create the directory to contain our images
 func (is *imageService) mkImagePath(galleryID uint) (string, error) {
 
-	galleryPath := fmt.Sprintf("images/galleries/%v/", galleryID) //Создаёт паку с именем галери айди
-	err := os.MkdirAll(galleryPath, 0755)                         //MkdirAll создает каталог с именем path(путь) вместе со всеми необходимыми родителями и возвращает nil
+	galleryPath := is.imagePath(galleryID) //Создаёт паку с именем галери айди
+	err := os.MkdirAll(galleryPath, 0755)  //MkdirAll создает каталог с именем path(путь) вместе со всеми необходимыми родителями и возвращает nil
 	if err != nil {
 		return "", err
 	}
