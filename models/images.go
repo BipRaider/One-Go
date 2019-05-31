@@ -50,9 +50,12 @@ func (is *imageService) ByGalleryID(galleryID uint) ([]string, error) {
 	if err != nil {
 		panic(err)
 	}
+	for i := range files {
+		files[i] = "/" + files[i]
+	}
 	var filesPath []string
 	for _, str := range files {
-		str = strings.Replace(str, "\\", "/", -1)
+		str = strings.Replace(str, "\\", "/", -1) // Функция для замены символов в строке ( поменял \ на / из-за Windows меняет направление слеш)
 		filesPath = append(filesPath, str)
 	}
 

@@ -56,6 +56,9 @@ func main() {
 	r.HandleFunc("/login", usersC.Login).Methods("POST")
 	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
+	//Image routes
+	imageHandler := http.FileServer(http.Dir("./images/"))
+	r.PathPrefix("/images/").Handler(http.StripPrefix("/images/", imageHandler)) // Для вывода и обработки урл адресов и вывода картинок в браузер
 
 	//Gallery routes
 	r.Handle("/galleries", requireUserMw.ApplyFn(galleriesC.Index)).Methods("GET")
