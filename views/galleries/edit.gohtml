@@ -63,7 +63,7 @@
 <!-- -->
 
 {{define "deleteGalleryForm" }}
-<form action="/galleries/{{.ID}}/delete" method="POST">
+<form action="/galleries/{{.ID}}/delete" method="POST" class="form-horizontal">
   <div class="form-group">
      <div class="col-md-10 col-md-offset-1">
        <button type="submit" class="btn btn-danger">Delete</button>
@@ -93,9 +93,10 @@
   {{range .ImagesSplitN 6}}
     <div class="col-md-2">
       {{range .}}
-       <a href={{.}}>
-          <img src="{{.}}" class = "thumbnail">
+       <a href={{.Path}}>
+          <img src="{{.Path}}" class = "thumbnail">
        </a> 
+       {{template "deleteImageForm" .}}
       {{end}} 
     </div>
   {{end}}
@@ -104,9 +105,20 @@
     <style>
      .thumbnail{
         width: 100%;
+        margin-bottom: 6px;
       }
    </style>
 {{end}}
 
 <!-- multiple="multiple"  - добовляет возможность выделять для загрузки  много файлов-->
 <!-- enctype="multipart/form-data"    -  за пись фалйло в обычном стандарете не кадируя-->
+
+<!-- -->
+
+{{define "deleteImageForm" }}
+<form action="/galleries/{{.GalleryID}}/images/{{.Filename}}/delete" method="POST">
+   <button type="submit" class="btn btn-default">Delete</button>
+</form>
+{{end}}
+
+<!-- -->

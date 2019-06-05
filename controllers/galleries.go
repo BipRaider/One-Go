@@ -186,7 +186,9 @@ func (g *Galleries) ImageUpload(w http.ResponseWriter, r *http.Request) {
 	//TODO : Parse a multipart form
 	var vd views.Data
 	vd.Yield = gallery
-	err = r.ParseMultipartForm(maxMultipartMem) // указываем размеры загружаемых файлов
+	//это может использоваться для анализа форм, закодированных как multipart / form-data.
+	err = r.ParseMultipartForm(maxMultipartMem) //сообщает нашему коду максимальное количество байтов любых файлов для хранения в памяти.
+
 	if err != nil {
 		vd.SetAlert(err)            // выбор и передачи  ошибки
 		g.EditView.Render(w, r, vd) //вывод данных на экран
@@ -210,6 +212,42 @@ func (g *Galleries) ImageUpload(w http.ResponseWriter, r *http.Request) {
 			g.EditView.Render(w, r, vd) //вывод данных на экран
 			return
 		}
+	}
+	url, err := g.r.Get(EditGallery).URL("id", fmt.Sprintf("%v", gallery.ID))
+	if err != nil {
+		//TODO: Make this go to the index page
+		http.Redirect(w, r, "/galleries", http.StatusFound)
+		return
+	}
+	http.Redirect(w, r, url.Path, http.StatusFound)
+}
+
+///_POST/galleries/:id/images/:filename/delete
+
+func (g *Galleries) ImageDelete(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r) // используется для индефикаций по id user
+	if err != nil {
+		return
+	}
+	user := context.User(r.Context()) // Используеться как афтаризация для всех страниц.
+	if gallery.UserID != user.ID {
+		http.Error(w, "Gallery not found  for update", http.StatusNotFound)
+		return
+	}
+	//Vars возвращает переменные маршрута для текущего запроса, если таковые имеются.
+	filename := mux.Vars(r)["filename"]
+	i := models.Image{
+		Filename:  filename,
+		GalleryID: gallery.ID,
+	}
+
+	err = g.is.Delete(&i)
+	if err != nil {
+		var vd views.Data
+		vd.Yield = gallery
+		vd.SetAlert(err)
+		g.EditView.Render(w, r, vd)
+		return
 	}
 	url, err := g.r.Get(EditGallery).URL("id", fmt.Sprintf("%v", gallery.ID))
 	if err != nil {
