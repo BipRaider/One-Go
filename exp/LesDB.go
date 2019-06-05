@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"../models"
@@ -29,7 +30,7 @@ const (
 func main() {
 	us, err := models.NewUserService(mysqlinfo)
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	defer us.Close()
 	us.DestructiveReset()
@@ -46,14 +47,14 @@ func main() {
 	}
 	userByID, err := us.ByID(user.ID)
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 
 	fmt.Println(userByID)
 
 	// db, err := gorm.Open("mysql", mysqlinfo) //Соединение с базой данных  !!ВАЖНО ?parseTime=true  добисывать в конце если надо чтобы выводило время
 	// if err != nil {
-	// 	panic(err)
+	// 	log.Println(err)
 	// }
 	// defer db.Close()
 

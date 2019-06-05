@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -64,7 +65,7 @@ func (is *imageService) ByGalleryID(galleryID uint) ([]Image, error) {
 	pathImage := is.imagePath(galleryID)
 	files, err := filepath.Glob(pathImage + "*")
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	var filesPath []string
 

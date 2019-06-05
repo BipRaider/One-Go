@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -45,7 +46,7 @@ func main() {
 	})
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	http.Handle("/", r)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"../models"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -11,7 +12,7 @@ func main() {
 	//соединение сайта с базойданых
 	us, err := models.NewUserService("root:alfadog1@/bipusdb?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	defer us.Close()
 	//us.DestructiveReset()
@@ -25,12 +26,12 @@ func main() {
 	// }
 	// us.Create(&user)
 	// if err != nil {
-	// 	panic(err)
+	// 	log.Println(err)
 	// }
 	// fmt.Println(user)
 	user2, err := us.ByRemember("123456")
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	fmt.Println(*user2)
 }

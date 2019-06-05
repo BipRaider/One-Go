@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
-	"os"
 
 	"./controllers"
 	"./middleware"
@@ -28,7 +28,7 @@ const (
 func main() {
 	//соединение с базойданых
 	services, err := models.NewServices(mysqlinfo)
-	must(err, 3)
+	must(err)
 
 	defer services.Close()
 	//services.DestructiveReset() // удаляет из бд
@@ -84,9 +84,9 @@ func main() {
 //https://getbootstrap.com/docs/3.3/components/#nav
 
 //Функция вывода ошибоки
-func must(err error, n int) {
+func must(err error) {
 	if err != nil {
-		os.Exit(n)
+		log.Println(err)
 	}
 
 }

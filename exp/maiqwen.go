@@ -2,6 +2,7 @@ package main
 
 import (
 	"html/template" //https://golang.org/pkg/text/template/
+	"log"
 	"os"
 )
 
@@ -25,7 +26,7 @@ func main() {
 	t, err := template.ParseFiles("exp/hello.gohtml") // дайёт адрес най файл   и определяет по типу имени в вочто оборачиваться будет файл ,функция ParseFiles  для анализа нашего файла шаблона
 
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 
 	data := User{ //  обьевляем переменную с сзначениями

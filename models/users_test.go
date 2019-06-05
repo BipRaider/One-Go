@@ -1,6 +1,7 @@
 package models
 
 import (
+	"log"
 	"testing"
 	"time"
 
@@ -14,7 +15,7 @@ func testingUserService() (*UserService, error) {
 
 	us, err := NewUserService(mysqlinfo_test)
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	defer us.Close()
 	us.db.LogMode(false)

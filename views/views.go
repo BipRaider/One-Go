@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 
 	"../context"
@@ -25,7 +24,7 @@ func NewView(layout string, files ...string) *View {
 	t, err := template.ParseFiles(files...) // Записываем в переменую t значаения(срез  файлов ) с  файла по сылке
 
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	return &View{
 		Template: t, //Присваиваем шаблону   новый шаблон t  и возвращаем даные
@@ -45,7 +44,7 @@ func layoutFiles() []string { //Добовляем данные из файла
 
 	files, err := filepath.Glob(LayoutDir + "*" + TemplateExt)
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
 	return files
 }
@@ -115,7 +114,7 @@ func NotFound() *View {
 	files = append(files, layoutFiles()...)
 	t, err := template.ParseFiles(files...)
 	if err != nil {
-		os.Exit(404)
+		log.Println(err)
 	}
 	return &View{
 		Template: t,
