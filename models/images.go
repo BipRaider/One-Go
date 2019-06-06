@@ -100,7 +100,7 @@ func (is *imageService) mkImagePath(galleryID uint) (string, error) {
 	// MkdirAll также требует FileMode, который в основном является просто набором разрешений
 	// для каталога. Мы будем использовать 0755, который дает текущему пользователю разрешение
 	// что-либо делать с файлом, а другим разрешает чтение и выполнение.
-	galleryPath := is.imagePath(galleryID) //присваеваем пусть(строку)  с именем галери и айди
+	galleryPath := is.imagePath(galleryID) //присваеваем путь(строку)  с именем галери и айди
 	err := os.MkdirAll(galleryPath, 0755)  //MkdirAll создает каталог с именем пути вместе со всеми необходимыми родителями и возвращает nil
 	if err != nil {
 		return "", err

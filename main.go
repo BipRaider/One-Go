@@ -8,7 +8,9 @@ import (
 	"./controllers"
 	"./middleware"
 	"./models"
+	"./rand"
 	"./views"
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 )
 
@@ -39,6 +41,14 @@ func main() {
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUser(services.User)
 	galleriesC := controllers.NewGalleries(services.Gallery, services.Image, r)
+
+	///----------------- Защита сайта от поделлки ,копирования
+	isProd := false
+	b, err := rand.Bytes(32) // кодируем даные
+	must(err)
+	csrfMw := csrf.Protect(b, csrf.Secure(isProd)) // кодируем страницу
+	// Protect - это промежуточное ПО HTTP, которое обеспечивает защиту от подделки межсайтовых запросов.
+	// Secure -устанавливает флаг безопасности в куки. По умолчанию true // Установите  «false» в противном случае файл cookie не будет отправляться по небезопасному каналу
 	///-----------------
 	userMw := middleware.User{
 		UserService: services.User, // запрос из БД, данные на пользователя
@@ -46,7 +56,7 @@ func main() {
 	requireUserMw := middleware.RequireUser{
 		User: userMw,
 	}
-	///------------
+	///----------------
 	NotF = views.NotFound()                        //2
 	r.NotFoundHandler = http.HandlerFunc(notFound) //3 //Заменили вид выводящейся ошибки на своё
 	r.Handle("/", staticC.Home).Methods("GET")
@@ -80,7 +90,7 @@ func main() {
 	r.HandleFunc("/galleries/{id:[0-9]+}", galleriesC.Show).Methods("GET").Name(controllers.ShowGallery)
 
 	fmt.Println("Starting the server on :3000...")
-	http.ListenAndServe(":3000", userMw.Apply(r)) //end// это адрес сервера  куда будет отправляться данные
+	http.ListenAndServe(":3000", csrfMw(userMw.Apply(r))) // это адрес сервера  куда будет отправляться данные и закодированый от поделки
 
 }
 

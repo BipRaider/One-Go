@@ -1,6 +1,7 @@
 package views
 
 import (
+	"html/template"
 	"log"
 
 	"../models"
@@ -25,9 +26,11 @@ type Alert struct {
 }
 
 // Data is the top leval structure that views expect data
+//to come in
 type Data struct {
 	Alert *Alert
 	User  *models.User
+	CSRF  template.HTML //Кодируем страницы
 	Yield interface{}
 }
 

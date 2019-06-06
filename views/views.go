@@ -2,11 +2,14 @@ package views
 
 import (
 	"bytes"
+	"errors"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/gorilla/csrf"
 
 	"../context"
 )
@@ -21,7 +24,11 @@ func NewView(layout string, files ...string) *View {
 	addTemplatePath(files)
 	addTemlateExt(files)
 	files = append(files, layoutFiles()...)
-	t, err := template.ParseFiles(files...) // Записываем в переменую t значаения(срез  файлов ) с  файла по сылке
+	t, err := template.New("").Funcs(template.FuncMap{ // Создали новый шаблон с функцией
+		"csrfField": func() (template.HTML, error) {
+			return "", errors.New("csrfField is not emplemented")
+		},
+	}).ParseFiles(files...) // Записываем в переменую t значаения(срез  файлов ) с  файла по сылке
 
 	if err != nil {
 		log.Println(err)
@@ -98,7 +105,15 @@ func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) 
 	vd.User = context.User(r.Context())
 
 	var buf bytes.Buffer
-	if err := v.Template.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
+
+	csrfField := csrf.TemplateField(r)        //TemplateField - это помощник шаблона для html / template, который предоставляет поле <input>, заполненное токеном CSRF.
+	tpl := v.Template.Funcs(template.FuncMap{ // Funcs добавляет элементы карты аргумента в карту функции шаблона. Он должен быть вызван до синтаксического анализа шаблона.
+		"csrfField": func() template.HTML {
+			return csrfField
+		},
+	})
+	// ExecuteTemplate применяет шаблон, связанный с t, который имеет данное имя, к указанному объекту данных и записывает вывод в wr.
+	if err := tpl.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
 		log.Println(err)
 		http.Error(w, "Something went wrong. If the problem  persists , please email support@thebipus.com ", http.StatusInternalServerError)
 		return
