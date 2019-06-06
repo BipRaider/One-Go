@@ -272,7 +272,7 @@ func (g *Galleries) Delete(w http.ResponseWriter, r *http.Request) {
 		g.EditView.Render(w, r, vd)
 		return
 	}
-	http.Redirect(w, r, "/galleries", http.StatusFound) // перенаправит на страницу  "/galleries"
+	http.Redirect(w, r, "/galleries", http.StatusFound) // после удаления перенаправит на страницу  "/galleries"
 }
 
 // используется для индефикаций по id user

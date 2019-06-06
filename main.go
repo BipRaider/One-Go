@@ -47,7 +47,7 @@ func main() {
 	b, err := rand.Bytes(32) // кодируем даные
 	must(err)
 	csrfMw := csrf.Protect(b, csrf.Secure(isProd)) // кодируем страницу
-	// Protect - это промежуточное ПО HTTP, которое обеспечивает защиту от подделки межсайтовых запросов.
+	// Protect - это промежуточное ПО HTTP, которое обеспечивает защиту CSRF на маршрутах, подключенных к маршрутизатору или суб-маршрутизатору.
 	// Secure -устанавливает флаг безопасности в куки. По умолчанию true // Установите  «false» в противном случае файл cookie не будет отправляться по небезопасному каналу
 	///-----------------
 	userMw := middleware.User{
@@ -59,6 +59,7 @@ func main() {
 	///----------------
 	NotF = views.NotFound()                        //2
 	r.NotFoundHandler = http.HandlerFunc(notFound) //3 //Заменили вид выводящейся ошибки на своё
+	//------
 	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/home", staticC.Home).Methods("GET")       //3
 	r.Handle("/contact", staticC.Contact).Methods("GET") //3

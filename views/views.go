@@ -24,9 +24,9 @@ func NewView(layout string, files ...string) *View {
 	addTemplatePath(files)
 	addTemlateExt(files)
 	files = append(files, layoutFiles()...)
-	t, err := template.New("").Funcs(template.FuncMap{ // Создали новый шаблон с функцией
+	t, err := template.New("").Funcs(template.FuncMap{ // Создали новый шаблон с функцией и добавили к остольным шаблонам
 		"csrfField": func() (template.HTML, error) {
-			return "", errors.New("csrfField is not emplemented")
+			return "", errors.New("csrfField is not emplemented") //выводит ошибку и пустой шаблон
 		},
 	}).ParseFiles(files...) // Записываем в переменую t значаения(срез  файлов ) с  файла по сылке
 
@@ -88,7 +88,7 @@ func (v *View) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // Функция  которая выводит в браузер нужную файл и какого шаблона , 1.2
-//Render is used to render the viewwith the predefind layout
+//Render is used to render the view with the predefind layout
 func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8") // надо указывать кодировку ;charset=utf-8
 	var vd Data

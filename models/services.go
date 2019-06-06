@@ -8,7 +8,7 @@ func NewServices(connectionInfo string) (*Services, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.LogMode(true) // устанавливаем онэим ведения журнала (True для подробных ),(False - выводит ток ошибки )
+	db.LogMode(true) // устанавливаем онаним ведения журнала (True для подробных ),(False - выводит ток ошибки )
 	return &Services{
 		User:    NewUserService(db),
 		Gallery: NewGalleryService(db),
@@ -28,7 +28,7 @@ type Services struct {
 func (s *Services) Close() error { return s.db.Close() }
 
 //DestructiveReset drops all tables and rebuilds them
-func (s *Services) DestructiveReset() error { // удалит таблиц если существует
+func (s *Services) DestructiveReset() error { // удалит таблицы если существует
 	err := s.db.DropTableIfExists(&User{}, &Gallery{}).Error
 	if err != nil {
 		return err

@@ -3,6 +3,7 @@ package middleware
 ///Требования к юзеру на афторизацию тд
 import (
 	"net/http"
+	"strings"
 
 	"../context"
 	"../models"
@@ -16,8 +17,16 @@ func (mw *User) Apply(next http.Handler) http.HandlerFunc {
 	return mw.ApplyFn(next.ServeHTTP)
 }
 func (mw *User) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+		//if the user is requesting a static asset or image
+		// we will not need  to lookup the current user so we skip
+		// doing that.
+		if strings.HasPrefix(path, "/assets/") || strings.HasPrefix(path, "/images/") {
+			next(w, r)
+			return
+		}
+
 		cookei, err := r.Cookie("remember_token") // если пользователь не зарегестрирован(нету куки) то перенаправляет на регистрацию
 		if err != nil {
 			next(w, r)
