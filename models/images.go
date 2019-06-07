@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,7 +17,11 @@ type Image struct {
 }
 
 func (i *Image) Path() string {
-	return "/" + i.RelativePath()
+	// приоброзовали путь в строку для не коректных названий картинок (a_1&&%2\/2d8.jpg)
+	temp := url.URL{
+		Path: "/" + i.RelativePath(),
+	}
+	return temp.String()
 }
 
 func (i *Image) RelativePath() string {
@@ -105,10 +110,12 @@ func (is *imageService) mkImagePath(galleryID uint) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	//galleryPath := filepath.Join("images", "galleries",fmt.Sprintf(gallery.ID))
-	// Мы используем filepath.Join вместо построения пути вручную,
-	// потому что косые черты и другие символы могут различаться в разных операционных системах.
+
 	return galleryPath, nil
 }
+
+//galleryPath := filepath.Join("images", "galleries",fmt.Sprintf(gallery.ID))
+// Мы используем filepath.Join вместо построения пути вручную,
+// потому что косые черты и другие символы могут различаться в разных операционных системах.
 
 //Страничка 578

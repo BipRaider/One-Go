@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"../context"
 	"../models"
@@ -198,7 +199,7 @@ func (g *Galleries) ImageUpload(w http.ResponseWriter, r *http.Request) {
 			g.EditView.Render(w, r, vd) //вывод данных на экран
 			return
 		}
-		defer file.Close() // в конце закрываем открытый файл
+		defer file.Close() // закрываем открытый файл
 
 		err = g.is.Create(gallery.ID, file, f.Filename)
 		if err != nil {
@@ -228,13 +229,15 @@ func (g *Galleries) ImageDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Gallery not found  for update", http.StatusNotFound)
 		return
 	}
+	//------
 	//Vars возвращает переменные маршрута для текущего запроса, если таковые имеются.
 	filename := mux.Vars(r)["filename"]
+	filename = strings.Replace(filename, "+", " ", -1) // Функция для замены символов в строке ( поменял "+" на " " из-за Windows меняет направление меняем плюс на пустую строчку пробел)
+
 	i := models.Image{
 		Filename:  filename,
 		GalleryID: gallery.ID,
 	}
-
 	err = g.is.Delete(&i)
 	if err != nil {
 		var vd views.Data
@@ -243,6 +246,8 @@ func (g *Galleries) ImageDelete(w http.ResponseWriter, r *http.Request) {
 		g.EditView.Render(w, r, vd)
 		return
 	}
+
+	///-----------
 	url, err := g.r.Get(EditGallery).URL("id", fmt.Sprintf("%v", gallery.ID))
 	if err != nil {
 		log.Println(err)
