@@ -23,13 +23,12 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 
 }
 
-const (
-	mysqlinfo = "root:alfadog1@/bipusdb?charset=utf8&parseTime=True&loc=Local"
-)
-
 func main() {
+	cfg := DefaultConfig()
+	dbCfg := DefaultMysqlConfig()
+
 	//соединение с базойданых
-	services, err := models.NewServices(mysqlinfo)
+	services, err := models.NewServices(dbCfg.Dialect(), dbCfg.ConnectionInf())
 	must(err)
 
 	defer services.Close()
@@ -43,10 +42,10 @@ func main() {
 	galleriesC := controllers.NewGalleries(services.Gallery, services.Image, r)
 
 	///----------------- Защита сайта от поделлки ,копирования
-	isProd := false
+
 	b, err := rand.Bytes(32) // кодируем даные
 	must(err)
-	csrfMw := csrf.Protect(b, csrf.Secure(isProd)) // кодируем страницу
+	csrfMw := csrf.Protect(b, csrf.Secure(cfg.isProd())) // кодируем страницу
 	// Protect - это промежуточное ПО HTTP, которое обеспечивает защиту CSRF на маршрутах, подключенных к маршрутизатору или суб-маршрутизатору.
 	// Secure -устанавливает флаг безопасности в куки. По умолчанию true // Установите  «false» в противном случае файл cookie не будет отправляться по небезопасному каналу
 	///-----------------
@@ -90,8 +89,8 @@ func main() {
 
 	r.HandleFunc("/galleries/{id:[0-9]+}", galleriesC.Show).Methods("GET").Name(controllers.ShowGallery)
 
-	fmt.Println("Starting the server on :3000...")
-	http.ListenAndServe(":3000", csrfMw(userMw.Apply(r))) // это адрес сервера  куда будет отправляться данные и закодированый от поделки
+	fmt.Printf("Starting the server on :%d...\n", cfg.Port)
+	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), csrfMw(userMw.Apply(r))) // это адрес сервера  куда будет отправляться данные и закодированый от поделки
 
 }
 

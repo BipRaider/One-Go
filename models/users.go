@@ -8,13 +8,12 @@ import (
 	"../rand"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 const userPwPepper = "secret-random-string" // любую страку написать для усложнения паролей
-const hmacSecretKey = " secret-hmac-key"
+const hmacSecretKey = " secret-hmac-key"    // любую страку написать для усложнения паролей
 
 // User the user model in our database
 type User struct {

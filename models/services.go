@@ -1,10 +1,14 @@
 package models
 
-import "github.com/jinzhu/gorm"
+//Обьеденяем все микросерверы в один общий
+import (
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+)
 
-func NewServices(connectionInfo string) (*Services, error) {
-	//Соединение с базой данных  !!ВАЖНО ?parseTime=true  добисывать в конце если надо чтобы выводило время
-	db, err := gorm.Open("mysql", connectionInfo) //"root:password@/NameDB?charset=utf8&parseTime=True&loc=Local"
+func NewServices(dialect, connectionInfo string) (*Services, error) {
+	//Соединение с базой данных  !!ВАЖНО ?charset=utf8&parseTime=True&loc=Local  добисывать в конце если надо чтобы выводило время
+	db, err := gorm.Open(dialect, connectionInfo) //"root:password@/NameDB?charset=utf8&parseTime=True&loc=Local"
 	if err != nil {
 		return nil, err
 	}
