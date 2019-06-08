@@ -6,19 +6,62 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-func NewServices(dialect, connectionInfo string) (*Services, error) {
-	//Соединение с базой данных  !!ВАЖНО ?charset=utf8&parseTime=True&loc=Local  добисывать в конце если надо чтобы выводило время
-	db, err := gorm.Open(dialect, connectionInfo) //"root:password@/NameDB?charset=utf8&parseTime=True&loc=Local"
-	if err != nil {
-		return nil, err
+type ServicesConfig func(*Services) error
+
+//Соединяемся с базой данных
+func WithGorm(dialect, connectionInfo string) ServicesConfig {
+	return func(s *Services) error {
+		//Соединение с базой данных  !!ВАЖНО ?charset=utf8&parseTime=True&loc=Local  добисывать в конце если надо чтобы выводило время
+		db, err := gorm.Open(dialect, connectionInfo) //"root:password@/NameDB?charset=utf8&parseTime=True&loc=Local"
+		if err != nil {
+			return err
+		}
+		s.db = db
+		return nil
 	}
-	db.LogMode(true) // устанавливаем онаним ведения журнала (True для подробных ),(False - выводит ток ошибки )
-	return &Services{
-		User:    NewUserService(db),
-		Gallery: NewGalleryService(db),
-		Image:   NewImageService(),
-		db:      db,
-	}, nil
+}
+
+// LogMode установить режим журнала, `true` для подробных журналов,` false` для отсутствия журнала, по умолчанию, будет печатать только журналы ошибок
+func WithLogMode(mode bool) ServicesConfig {
+	return func(s *Services) error {
+		s.db.LogMode(mode)
+		return nil
+	}
+}
+
+// Проверка пользователя  на коодировку
+func WithUser(pepper, hmacKye string) ServicesConfig {
+	return func(s *Services) error {
+		s.User = NewUserService(s.db, pepper, hmacKye)
+		return nil
+	}
+}
+
+// запуск голирей
+func WithGallery() ServicesConfig {
+	return func(s *Services) error {
+		s.Gallery = NewGalleryService(s.db)
+		return nil
+	}
+}
+
+//ЗАпускаем просмотр картинок
+func WithImage() ServicesConfig {
+	return func(s *Services) error {
+		s.Image = NewImageService()
+		return nil
+	}
+}
+
+//Запуск функций  которые запускают Бд, Проверку на кодироания , запускают галерей и просмотр картинок
+func NewServices(cfgs ...ServicesConfig) (*Services, error) {
+	var s Services
+	for _, cfg := range cfgs {
+		if err := cfg(&s); err != nil {
+			return nil, err
+		}
+	}
+	return &s, nil
 }
 
 type Services struct {

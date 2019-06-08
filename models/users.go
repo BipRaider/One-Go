@@ -12,9 +12,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const userPwPepper = "secret-random-string" // любую страку написать для усложнения паролей
-const hmacSecretKey = " secret-hmac-key"    // любую страку написать для усложнения паролей
-
 // User the user model in our database
 type User struct {
 	gorm.Model
@@ -62,12 +59,13 @@ type UserService interface {
 	UserDB
 }
 
-func NewUserService(db *gorm.DB) UserService {
-	ug := &userGorm{db}
-	hmac := hash.NewHMAC(hmacSecretKey)
-	uv := newUserValidator(ug, hmac)
+func NewUserService(db *gorm.DB, pepper, hmacKye string) UserService {
+	ug := &userGorm{db}                      // обьявляемпуть до бд
+	hmac := hash.NewHMAC(hmacKye)            // кодируем хаш юзера
+	uv := newUserValidator(ug, hmac, pepper) // проверяем на соотвецтвие пользователя  и ошибки
 	return &userService{
 		UserDB: uv,
+		pepper: pepper,
 	}
 }
 
@@ -75,6 +73,7 @@ var _ UserService = &userService{}
 
 type userService struct {
 	UserDB
+	pepper string
 }
 
 //Authenticate  can be used to authenticate a user with the
@@ -85,7 +84,7 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password+userPwPepper)) // функция для разшифрофки  хешированый пороль
+	err = bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password+us.pepper)) // функция для разшифрофки  хешированый пороль
 	if err != nil {
 		switch err {
 		case bcrypt.ErrMismatchedHashAndPassword: ////  выводит ошибку хеша
@@ -115,11 +114,12 @@ var _ UserDB = &userValidator{}
 
 // функция для добовления  данных в type userValidetor  для проверки мыла на валидность заполнение
 // emailRegex: regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,16}$`)
-func newUserValidator(udb UserDB, hmac hash.HMAC) *userValidator {
+func newUserValidator(udb UserDB, hmac hash.HMAC, pepper string) *userValidator {
 	return &userValidator{
 		UserDB:     udb,
 		hmac:       hmac,
 		emailRegex: regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,16}$`), // используется для сопоставления адресов электронной почты
+		pepper:     pepper,
 	}
 }
 
@@ -127,6 +127,7 @@ type userValidator struct {
 	UserDB
 	hmac       hash.HMAC
 	emailRegex *regexp.Regexp //https://gobyexample.com/regular-expressions
+	pepper     string
 }
 
 // ByEmail will normalize the email address before calling
@@ -213,7 +214,7 @@ func (uv *userValidator) bcryptPassword(user *User) error {
 	if user.Password == "" {
 		return nil
 	}
-	pwBytes := []byte(user.Password + userPwPepper)                              // этим услажнили просто пароль
+	pwBytes := []byte(user.Password + uv.pepper)                                 // этим услажнили просто пароль
 	hashedBytes, err := bcrypt.GenerateFromPassword(pwBytes, bcrypt.DefaultCost) // используется для хеширования пароля
 	if err != nil {
 		return err

@@ -33,8 +33,10 @@ func DefaultMysqlConfig() MysqlConfig {
 
 //---------------
 type Config struct {
-	Port int
-	Env  string
+	Port    int    `json:"port"`
+	Env     string `json:"env"`
+	Pepper  string `json:"pepper"`  // любую стрoку написать для усложнения паролей
+	HMACKey string `json:"hmackey"` // любую стрoку написать для усложнения паролей
 }
 
 func (c Config) isProd() bool {
@@ -43,17 +45,12 @@ func (c Config) isProd() bool {
 
 func DefaultConfig() Config {
 	return Config{
-		Port: 3000,  // локальный порт проэкта
-		Env:  "dev", //// Secure -устанавливает флаг безопасности в куки. По умолчанию true
-		// Установите  «false» в противном случае файл cookie не будет отправляться по небезопасному каналу
+		Port:    3000,  // локальный порт проэкта
+		Env:     "dev", //// Secure -устанавливает флаг безопасности в куки. По умолчанию true// Установите  «false» в противном случае файл cookie не будет отправляться по небезопасному каналу
+		Pepper:  "secret-random-string",
+		HMACKey: "secret-hmac-key",
 	}
 }
-
-//------
-// #models/users.go
-
-// const userPwPepper = "secret-random-string" // любую страку написать для усложнения паролей
-// const hmacSecretKey = " secret-hmac-key"    // любую страку написать для усложнения паролей
 
 // #models/service.go
 

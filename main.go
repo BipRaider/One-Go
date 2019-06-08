@@ -28,7 +28,13 @@ func main() {
 	dbCfg := DefaultMysqlConfig()
 
 	//соединение с базойданых
-	services, err := models.NewServices(dbCfg.Dialect(), dbCfg.ConnectionInf())
+	services, err := models.NewServices(
+		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInf()),
+		models.WithLogMode(!cfg.isProd()),
+		models.WithUser(cfg.Pepper, cfg.HMACKey),
+		models.WithGallery(),
+		models.WithImage(),
+	)
 	must(err)
 
 	defer services.Close()
