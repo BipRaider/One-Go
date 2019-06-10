@@ -117,9 +117,9 @@ var _ UserDB = &userValidator{}
 func newUserValidator(udb UserDB, hmac hash.HMAC, pepper string) *userValidator {
 	return &userValidator{
 		UserDB:     udb,
-		hmac:       hmac,
+		hmac:       hmac,                                                              // Добовляем кодироваку пользователю виде хэша, кукис
 		emailRegex: regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,16}$`), // используется для сопоставления адресов электронной почты
-		pepper:     pepper,
+		pepper:     pepper,                                                            // кодированя мыла
 	}
 }
 

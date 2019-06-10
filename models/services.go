@@ -37,7 +37,7 @@ func WithUser(pepper, hmacKye string) ServicesConfig {
 	}
 }
 
-// запуск голирей
+// запуск галирей
 func WithGallery() ServicesConfig {
 	return func(s *Services) error {
 		s.Gallery = NewGalleryService(s.db)
@@ -45,7 +45,7 @@ func WithGallery() ServicesConfig {
 	}
 }
 
-//ЗАпускаем просмотр картинок
+//Запускаем просмотр картинок
 func WithImage() ServicesConfig {
 	return func(s *Services) error {
 		s.Image = NewImageService()

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,8 +25,12 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	cfg := DefaultConfig()
-	dbCfg := DefaultMysqlConfig()
+	boolPtr := flag.Bool("Service", false,
+		"Provide this flag in production.This ensures"+
+			"that a .config file is provided the application starts.") //переменая -определяем запущены ли  файлa (в нашем случае Server)
+	flag.Parse()                // возвращаем  определёные файлы при запуске
+	cfg := LoadConfig(*boolPtr) // переменная запуск конфига  который бреобразуется из докумета и обрабатуеться  JSON методом
+	dbCfg := cfg.Database       // переменая с данными о сапуске сервера БД
 
 	//соединение с базойданых
 	services, err := models.NewServices(
@@ -101,7 +106,6 @@ func main() {
 }
 
 //https://www.gorillatoolkit.org/pkg/mux
-//http://localhost:3000/
 //https://getbootstrap.com/docs/3.3/components/#nav
 
 //Функция вывода ошибоки
@@ -112,6 +116,7 @@ func must(err error) {
 
 }
 
+//go build . && ./One-Go -Service  сохранить и запустить сервер
 //https://dev.mysql.com/doc/workbench/en/wb-mysql-connections-navigator-management-users-and-privileges.html
 
 //https://tproger.ru/translations/go-web-server/amp/ получени сертифеката https
