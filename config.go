@@ -73,7 +73,8 @@ func LoadConfig(configReq bool) Config {
 		log.Println(err)
 		fmt.Println("Using the default config....")
 		return DefaultConfig()
-	}
+	} // Если не будет найдень другой конфиг то по умолчанию запустится стандартный
+
 	//**
 	var c Config
 	dec := json.NewDecoder(f) // приобразуем данные  для чтения JSON
@@ -81,7 +82,7 @@ func LoadConfig(configReq bool) Config {
 	if err != nil {
 		log.Println(err)
 		fmt.Println("Using the default config....")
-		return DefaultConfig()
+		return DefaultConfig() // Если не будет найдень другой конфиг то по умолчанию запустится стандартный
 	}
 	fmt.Println("Successfully loaded .config")
 	return c
