@@ -120,3 +120,20 @@ func must(err error) {
 //https://dev.mysql.com/doc/workbench/en/wb-mysql-connections-navigator-management-users-and-privileges.html
 
 //https://tproger.ru/translations/go-web-server/amp/ получени сертифеката https
+// Урок номер 16.9 надо купить домен и тд
+//урок 16.10 пересмотреть
+
+//https://getcaddy.com/
+//ssh root@my ip
+//mysql -u root
+//sudo service mysql restart
+//sudo service mysql restart
+//sudo service mysql stop
+
+//https://caddyserver.com/docs/proxy
+//caddy
+//sudo nano /etc/systemd/system/caddy.service
+//systemctl enable caddy.service
+//sudo service caddy restart
+//journalctl -r
+//sudo service caddy stop
