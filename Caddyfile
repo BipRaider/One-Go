@@ -1,6 +1,8 @@
-myscreencast.bipgo.pw {
+bipus.bipgo.pw {
 gzip
 proxy / localhost:3000 {
     transparent
     }
+errors errors.log   
+ errors errors.log  
 }
