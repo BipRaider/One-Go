@@ -71,12 +71,14 @@ func main() {
 	r.NotFoundHandler = http.HandlerFunc(notFound) //3 //Заменили вид выводящейся ошибки на своё
 	//------
 	r.Handle("/", staticC.Home).Methods("GET")
-	r.Handle("/home", staticC.Home).Methods("GET")       //3
-	r.Handle("/contact", staticC.Contact).Methods("GET") //3
-	r.Handle("/login", usersC.LoginView).Methods("GET")
-	r.HandleFunc("/login", usersC.Login).Methods("POST")
+	r.Handle("/home", staticC.Home).Methods("GET")         //3
+	r.Handle("/contact", staticC.Contact).Methods("GET")   //3
 	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
+	r.Handle("/login", usersC.LoginView).Methods("GET")
+	r.HandleFunc("/login", usersC.Login).Methods("POST")
+	r.HandleFunc("/logout", requireUserMw.ApplyFn(usersC.Logout)).Methods("POST")
+
 	//Assets
 	assetHandler := http.FileServer(http.Dir("./assets/"))    //путь папки в системе
 	assetHandler = http.StripPrefix("/assets/", assetHandler) // удаляя указанный префикс из пути URL запроса и вызывая обработчик

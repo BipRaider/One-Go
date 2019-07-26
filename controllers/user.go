@@ -3,7 +3,9 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"time"
 
+	"../context"
 	"../models"
 	"../rand"
 	"../views"
@@ -150,6 +152,25 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/galleries", http.StatusFound)
+}
+
+//Logout is used to delete a users sessions cookien (remember_token)
+//and them will updata the user resource with a new remember token.
+//POST/logout
+func (u *Users) Logout(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{
+		Name:     "remember_token",
+		Value:    "",
+		Expires:  time.Now(),
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+
+	user := context.User(r.Context())
+	token, _ := rand.RememberToken()
+	user.Remember = token
+	u.us.Update(user)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 //signIn is used to sign the given user  in via cookies
