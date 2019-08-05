@@ -43,6 +43,6 @@ func String(nBytes int) (string, error) { //c генерируемый рэнд�
 
 //RememberToken is a helper function designed to generate
 //remember tokens of a predeterined byte size.
-func RememberToken() (string, error) { //c генерируется рэндом токен с колицеством символов что мы в ведём
+func RememberToken() (string, error) { //c генерируется рэндом токен с количеством символов что мы в ведём
 	return String(RemeberTokenBytes)
 }

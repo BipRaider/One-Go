@@ -20,8 +20,9 @@
 
 {{define "faq"}}
 <form action="/faq" method="POST">
+{{csrfField}}
   <fieldset>
-    
+  
     <div class="form-group">
       <label for="faq">FAQ</label>
       <textarea class="form-control" type="faq" name="faq" id="faq" rows="3"></textarea>

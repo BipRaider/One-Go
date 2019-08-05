@@ -111,10 +111,13 @@
 
 {{define "deleteImageForm" }}
 <form action="/galleries/{{.GalleryID}}/images/{{.Filename  | urlquery}}/delete" method="POST">
-    {{csrfField}}
+    {{csrfField}} <!--Требования к юзеру на афторизацию -->
    <button type="submit" class="btn btn-default">Delete</button>
 </form>
 {{end}}
 
 <!-- -->
 <!-- {{  urlquery }} -  декодирует вывод файлов с не кроектным адресом "&*\|/.,.jpg"   -->
+
+
+

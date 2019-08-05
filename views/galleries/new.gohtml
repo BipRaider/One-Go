@@ -19,7 +19,7 @@
 
 {{define "galleryForm"}}
 <form action="/galleries" method="POST">
-{{csrfField}}
+{{csrfField}} <!--Требования к юзеру на афторизацию -->
   <div class="form-group">
     <label for="title">Title</label><!--type GalleryForm struct-->
     <input type="text" name="title" class="form-control" id="title" placeholder="What is the title of your gallery?"> <!--type GalleryForm struct-->

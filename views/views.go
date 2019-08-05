@@ -3,6 +3,7 @@ package views
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -101,14 +102,20 @@ func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) 
 			Yield: data,
 		}
 	}
-
+	if alert := getAlert(r); alert != nil {
+		fmt.Println("Found an alert_________________________")
+		vd.Alert = alert
+		clearAlert(w)
+	}
+	fmt.Println("Done looking for an alert._______________________")
 	vd.User = context.User(r.Context())
-
 	var buf bytes.Buffer
-
+	// Нам нужно создать csrfField, используя текущий http-запрос.
 	csrfField := csrf.TemplateField(r)        //TemplateField - это помощник шаблона для html / template, который предоставляет поле <input>, заполненное токеном CSRF.
 	tpl := v.Template.Funcs(template.FuncMap{ // Funcs добавляет элементы карты аргумента в карту функции шаблона. Он должен быть вызван до синтаксического анализа шаблона.
+		// Мы также можем изменить тип возвращаемого значения нашей функции, так как нам больше не нужно беспокоиться об ошибках.
 		"csrfField": func() template.HTML {
+			// Затем мы можем создать это замыкание, которое возвращает csrfField для любых шаблонов, которым необходим доступ к нему.
 			return csrfField
 		},
 	})

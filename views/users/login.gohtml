@@ -18,7 +18,7 @@
 
 {{define "loginForm"}}
 <form action="/login" method="POST">
-{{csrfField}}
+{{csrfField}} <!--Требования к юзеру на афторизацию -->
   <div class="form-group">
     <label for="email">Email address</label>
     <input type="email" name="email" class="form-control" id="email" placeholder="Email">
@@ -27,6 +27,7 @@
     <label for="password">Password</label>
     <input type="password" name="password" class="form-control" id="password" placeholder="Password">
   </div>
-  <button type="submit" class="btn btn-info">Log In</button>
+    <button type="submit" class="btn btn-info">Log In</button>
 </form>
 {{end}}
+

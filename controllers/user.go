@@ -71,7 +71,6 @@ type SignupForm struct {
 //POST /signup
 ///
 func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обрабатывает в водимые данные в браузере
-	//----1.3---
 	var vd views.Data
 	var form SignupForm
 	if err := parseForm(r, &form); err != nil {
@@ -95,27 +94,11 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
-
-	http.Redirect(w, r, "/galleries", http.StatusFound)
-
-	//-----1.1---1.2---
-	// if err := r.ParseForm(); err != nil { //----1.1----
-	// 	os.Exit(8)
-	// }
-	//----1.1---
-	//r.PostForm = map[string][]string
-	// fmt.Fprintln(w, r.PostForm["emeil"]) // выводит срез записи  после в вода даных в sign up
-	// fmt.Fprintln(w, r.PostFormValue("emeil")) // выводит первую запись после в вода даных в sign up
-	// fmt.Fprintln(w, r.PostForm["password"])
-	// fmt.Fprintln(w, r.PostFormValue("password"))
-	//----1.2----
-	// dec := schema.NewDecoder()
-	// form := SignupForm{}
-	// if err := dec.Decode(&form, r.PostForm); err != nil {
-	// 	os.Exit(81)
-	// }
-	// fmt.Fprintln(w, form)
-
+	alert := views.Alert{
+		Level:   views.AlertLvlSuccess,
+		Message: "Welcom to BipGo.pw",
+	}
+	views.RedirectAlert(w, r, "/galleries", http.StatusFound, alert)
 }
 
 type LoginForm struct {
@@ -134,7 +117,7 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 		u.LoginView.Render(w, r, vd)
 		return
 	}
-	user, err := u.us.Authenticate(form.Email, form.Password)
+	user, err := u.us.Authenticate(form.Email, form.Password) // запрос из базы нужных данных
 	if err != nil {
 		switch err {
 		case models.ErrNotFaund:
@@ -151,37 +134,42 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 		u.LoginView.Render(w, r, vd)
 		return
 	}
-	http.Redirect(w, r, "/galleries", http.StatusFound)
+	alert := views.Alert{
+		Level:   views.AlertLvlSuccess,
+		Message: "Welcom to BipGo.pw",
+	}
+	views.RedirectAlert(w, r, "/galleries", http.StatusFound, alert)
 }
 
 //Logout is used to delete a users sessions cookien (remember_token)
 //and them will updata the user resource with a new remember token.
 //POST/logout
 func (u *Users) Logout(w http.ResponseWriter, r *http.Request) {
+	// удаляем старый токен , заменяем старый на новый
 	cookie := http.Cookie{
 		Name:     "remember_token",
 		Value:    "",
 		Expires:  time.Now(),
 		HttpOnly: true,
 	}
-	http.SetCookie(w, &cookie)
+	http.SetCookie(w, &cookie) // устанавливаем новый токен
 
-	user := context.User(r.Context())
-	token, _ := rand.RememberToken()
-	user.Remember = token
-	u.us.Update(user)
-	http.Redirect(w, r, "/", http.StatusFound)
+	user := context.User(r.Context())          //обновляем пользователя новым токеном запоминания
+	token, _ := rand.RememberToken()           //Генерируем токен
+	user.Remember = token                      //Запоминаем с генерированый токен
+	u.us.Update(user)                          /// обновляем пользователя
+	http.Redirect(w, r, "/", http.StatusFound) // отправляем пользователя на домашнюю страницу
 }
 
 //signIn is used to sign the given user  in via cookies
 func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
 	if user.Remember == "" {
-		token, err := rand.RememberToken()
+		token, err := rand.RememberToken() //Генерируем токен
 		if err != nil {
 			return err
 		}
-		user.Remember = token
-		err = u.us.Update(user)
+		user.Remember = token   //Запоминаем с генерированый токен
+		err = u.us.Update(user) // обновляем пользователя
 		if err != nil {
 			return err
 		}

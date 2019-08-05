@@ -14,7 +14,8 @@ func parseForm(r *http.Request, dst interface{}) error {
 	if err := r.ParseForm(); err != nil {
 		return err
 	}
-	dec := schema.NewDecoder()                          // NewDecoder возвращает новый декодер.
+	dec := schema.NewDecoder() // NewDecoder возвращает новый декодер.
+	// Вызываем функцию IgnoreUnkownKeys, чтобы сказать декодеру схемы игнорировать ключ токена CSRF
 	dec.IgnoreUnknownKeys(true)                         // Для сохранения обратной совместимости значением по умолчанию является false.
 	if err := dec.Decode(dst, r.PostForm); err != nil { //Decode- декодирует значения из map[string][]string в struct.
 		return err

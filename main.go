@@ -10,19 +10,18 @@ import (
 	"./middleware"
 	"./models"
 	"./rand"
-	"./views"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 )
 
-var NotF *views.View
+// var NotF *views.View
 
-func notFound(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	w.WriteHeader(http.StatusNotFound)
-	NotF.Render(w, r, nil)
+// func notFound(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "text/html")
+// 	w.WriteHeader(http.StatusNotFound)
+// 	NotF.Render(w, r, nil)
 
-}
+// }
 
 func main() {
 	boolPtr := flag.Bool("Service", false,
@@ -67,17 +66,17 @@ func main() {
 		User: userMw,
 	}
 	///----------------
-	NotF = views.NotFound()                        //2
-	r.NotFoundHandler = http.HandlerFunc(notFound) //3 //Заменили вид выводящейся ошибки на своё
+	// NotF = views.NotFound()
+	// r.NotFoundHandler = http.HandlerFunc(notFound) //Заменили вид выводящейся ошибки на своё
 	//------
 	r.Handle("/", staticC.Home).Methods("GET")
-	r.Handle("/home", staticC.Home).Methods("GET")         //3
-	r.Handle("/contact", staticC.Contact).Methods("GET")   //3
-	r.HandleFunc("/signup", usersC.New).Methods("GET")     //3
-	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
+	r.Handle("/home", staticC.Home).Methods("GET")
+	r.Handle("/contact", staticC.Contact).Methods("GET")
 	r.Handle("/login", usersC.LoginView).Methods("GET")
 	r.HandleFunc("/login", usersC.Login).Methods("POST")
 	r.HandleFunc("/logout", requireUserMw.ApplyFn(usersC.Logout)).Methods("POST")
+	r.HandleFunc("/signup", usersC.New).Methods("GET")
+	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
 
 	//Assets
 	assetHandler := http.FileServer(http.Dir("./assets/"))    //путь папки в системе
@@ -118,7 +117,7 @@ func must(err error) {
 //https://www.gorillatoolkit.org/pkg/mux
 //https://getbootstrap.com/docs/3.3/components/#nav
 
-//go build . && ./Go -Service  сохранить и запустить сервер
+//go build . && ./One-Go -Service  сохранить и запустить сервер
 
 //https://dev.mysql.com/doc/workbench/en/wb-mysql-connections-navigator-management-users-and-privileges.html
 
