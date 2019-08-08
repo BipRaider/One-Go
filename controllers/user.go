@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"../context"
+	"../email"
 	"../models"
 	"../rand"
 	"../views"
@@ -13,11 +14,12 @@ import (
 
 const bs string = "bootstrap"
 
-func NewUser(us models.UserService) *Users {
+func NewUser(us models.UserService, emailer *email.Client) *Users {
 	return &Users{
 		NewView:   views.NewView(bs, "users/new"),
 		LoginView: views.NewView(bs, "users/login"),
 		us:        us,
+		emailer:   emailer,
 	}
 }
 
@@ -25,6 +27,7 @@ type Users struct {
 	NewView   *views.View
 	LoginView *views.View
 	us        models.UserService
+	emailer   *email.Client // клиент отправления писем
 }
 
 //GET Reading a resource ПОЛУЧИТЬ Чтение ресурса
@@ -89,6 +92,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обраба
 		u.NewView.Render(w, r, vd)
 		return
 	}
+	u.emailer.Welcom(user.Name, user.Email) // Оправим письмо к нам на мыло (то мыло которое мы хочем получать песьмо от регестрируемых пользователей)
 	err := u.signIn(w, &user)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -187,3 +191,4 @@ func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
 
 //https://github.com/gorilla/mux
 //https://golang.org/pkg/net/http/#pkg-examples -----1.1-----
+//https://app.mailgun.com/app/account/setup

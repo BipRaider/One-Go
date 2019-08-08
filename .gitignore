@@ -1,4 +1,5 @@
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
+# Данная папка не сохраняет в гит репазиторий github те файлы что мы указываем ниже
 *.o
 *.a
 *.so

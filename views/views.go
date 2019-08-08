@@ -3,7 +3,6 @@ package views
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -103,11 +102,9 @@ func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) 
 		}
 	}
 	if alert := getAlert(r); alert != nil {
-		fmt.Println("Found an alert_________________________")
 		vd.Alert = alert
 		clearAlert(w)
 	}
-	fmt.Println("Done looking for an alert._______________________")
 	vd.User = context.User(r.Context())
 	var buf bytes.Buffer
 	// Нам нужно создать csrfField, используя текущий http-запрос.

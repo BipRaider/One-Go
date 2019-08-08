@@ -21,6 +21,7 @@ ssh root@bipus.bipgo.pw "go get github.com/gorilla/schema"
 ssh root@bipus.bipgo.pw "go get -u github.com/go-sql-driver/mysql"
 ssh root@bipus.bipgo.pw "go get github.com/jinzhu/gorm"
 ssh root@bipus.bipgo.pw "go get github.com/gorilla/csrf"
+ssh root@bipus.bipgo.pw "go get gopkg.in/mailgun/mailgun-go.v1"
 echo " Building the code on remote server..."
 ssh root@bipus.bipgo.pw 'cd /root/app; go build -o ./server /root/go/src/bipgo.pw/*.go'
 echo " Code built successfully!"

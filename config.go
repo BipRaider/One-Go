@@ -41,11 +41,12 @@ func DefaultMysqlConfig() MysqlConfig {
 
 //---------------
 type Config struct {
-	Port     int         `json:"port"`     // Адрес сервера
-	Env      string      `json:"env"`      // для безопасности в куки
-	Pepper   string      `json:"pepper"`   // любую стрoку написать для усложнения паролей
-	HMACKey  string      `json:"hmac_key"` // любую стрoку написать для усложнения паролей
-	Database MysqlConfig `json:"database"`
+	Port     int           `json:"port"`     // Адрес сервера
+	Env      string        `json:"env"`      // для безопасности в куки
+	Pepper   string        `json:"pepper"`   // любую стрoку написать для усложнения паролей
+	HMACKey  string        `json:"hmac_key"` // любую стрoку написать для усложнения паролей
+	Database MysqlConfig   `json:"database"` // конфиг базы данных
+	Mailgun  MailgunConfig `json:"mailgun"`  // конфиг почтовой россылки
 }
 
 // для вывода значения False
@@ -60,7 +61,14 @@ func DefaultConfig() Config {
 		Pepper:   "secret-random-string", // Для услажнения пароля в веденного пользователем
 		HMACKey:  "secret-hmac-key",      // для усложнения хешированя юзера
 		Database: DefaultMysqlConfig(),   // Запуск по умолчанию конфига
+
 	}
+}
+
+type MailgunConfig struct {
+	APIKey       string `json:"api_key"`
+	PublicAPIKey string `json:"public_api_key"`
+	Domain       string `json:"domain"`
 }
 
 // Приобразуем данные  из конфига с  помощью JSON для отправки данных на сервер для запуска БД

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"./controllers"
+	"./email"
 	"./middleware"
 	"./models"
 	"./rand"
@@ -45,10 +46,15 @@ func main() {
 	//services.DestructiveReset() // удаляет из бд
 	services.AutoMigrate() //записует в бд
 
+	mgCfg := cfg.Mailgun // почтовый отправитель
+	emailer := email.NewClient(
+		email.WithSender("Имя Оправителя", "bipusgo@gmail.com"),           // 1 Имя отправителя ,2 Email c которого отправили
+		email.WithMailgun(mgCfg.Domain, mgCfg.APIKey, mgCfg.PublicAPIKey), // прописываем ключи от отправителя почты
+	)
 	r := mux.NewRouter() //1 begin
 
 	staticC := controllers.NewStatic()
-	usersC := controllers.NewUser(services.User)
+	usersC := controllers.NewUser(services.User, emailer)
 	galleriesC := controllers.NewGalleries(services.Gallery, services.Image, r)
 
 	///----------------- Защита сайта от поделлки ,копирования
