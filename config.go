@@ -65,6 +65,7 @@ func DefaultConfig() Config {
 	}
 }
 
+//The key and login for  Mailgun
 type MailgunConfig struct {
 	APIKey       string `json:"api_key"`
 	PublicAPIKey string `json:"public_api_key"`

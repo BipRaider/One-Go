@@ -102,9 +102,10 @@ func (c *Client) Welcom(toName, toEmail string) error {
 	_, id, err := c.mg.Send(message)
 	fmt.Println("ID=", id)
 	return err
-	//https://documentation.mailgun.com/en/latest/user_manual.html#sending-via-api
+
 }
 
+//https://documentation.mailgun.com/en/latest/user_manual.html#sending-via-api
 const (
 	resetSubject = "Instructions for resetting your password."
 	resetBaseURL = "https://your_adres"

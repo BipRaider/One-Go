@@ -53,7 +53,9 @@ type Users struct {
 // GET /signup
 
 func (u *Users) New(w http.ResponseWriter, r *http.Request) { //обрабатывает Html шаблоны и вывоодит в браузер .
-	u.NewView.Render(w, r, nil)
+	var form SignupForm
+	parseURLparams(r, &form)
+	u.NewView.Render(w, r, form)
 }
 
 //This is used to render the form where  can create
@@ -76,6 +78,7 @@ type SignupForm struct {
 func (u *Users) Create(w http.ResponseWriter, r *http.Request) { // Обрабатывает в водимые данные в браузере
 	var vd views.Data
 	var form SignupForm
+	vd.Yield = &form
 	if err := parseForm(r, &form); err != nil {
 		log.Println(err)
 		vd.SetAlert(err)

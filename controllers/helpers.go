@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/gorilla/schema"
 )
@@ -14,10 +15,21 @@ func parseForm(r *http.Request, dst interface{}) error {
 	if err := r.ParseForm(); err != nil {
 		return err
 	}
+	return parseValues(r.PostForm, dst)
+}
+
+func parseURLparams(r *http.Request, dst interface{}) error {
+	if err := r.ParseForm(); err != nil {
+		return err
+	}
+	return parseValues(r.Form, dst)
+}
+
+func parseValues(values url.Values, dst interface{}) error {
 	dec := schema.NewDecoder() // NewDecoder возвращает новый декодер.
 	// Вызываем функцию IgnoreUnkownKeys, чтобы сказать декодеру схемы игнорировать ключ токена CSRF
-	dec.IgnoreUnknownKeys(true)                         // Для сохранения обратной совместимости значением по умолчанию является false.
-	if err := dec.Decode(dst, r.PostForm); err != nil { //Decode- декодирует значения из map[string][]string в struct.
+	dec.IgnoreUnknownKeys(true)                     // Для сохранения обратной совместимости значением по умолчанию является false.
+	if err := dec.Decode(dst, values); err != nil { //Decode- декодирует значения из map[string][]string в struct.
 		return err
 	}
 	return nil
