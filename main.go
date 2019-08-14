@@ -43,8 +43,8 @@ func main() {
 	must(err)
 
 	defer services.Close()
-	services.DestructiveReset() // удаляет из бд
-	services.AutoMigrate()      //записует в бд
+	//services.DestructiveReset() // удаляет из бд
+	services.AutoMigrate() //записует в бд
 
 	mgCfg := cfg.Mailgun // почтовый отправитель
 	emailer := email.NewClient(
@@ -83,7 +83,10 @@ func main() {
 	r.HandleFunc("/logout", requireUserMw.ApplyFn(usersC.Logout)).Methods("POST")
 	r.HandleFunc("/signup", usersC.New).Methods("GET")
 	r.HandleFunc("/signup", usersC.Create).Methods("POST") //3//Выводит сообщение от функций Create
-
+	r.Handle("/forgot", usersC.ForgotPwView).Methods("GET")
+	r.HandleFunc("/forgot", usersC.InitiateReset).Methods("POST")
+	r.HandleFunc("/reset", usersC.ResetPw).Methods("GET")
+	r.HandleFunc("/reset", usersC.CompleteReset).Methods("POST")
 	//Assets
 	assetHandler := http.FileServer(http.Dir("./assets/"))    //путь папки в системе
 	assetHandler = http.StripPrefix("/assets/", assetHandler) // удаляя указанный префикс из пути URL запроса и вызывая обработчик

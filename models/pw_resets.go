@@ -88,7 +88,7 @@ func (pwrg *pwResetGorm) Create(pwr *pwReset) error {
 
 func (pwrg *pwResetGorm) Delete(id uint) error {
 	pwr := pwReset{Model: gorm.Model{ID: id}}
-	return pwrg.db.Delete.(&pwr).Error
+	return pwrg.db.Delete(&pwr).Error
 }
 
 func (pwrv *pwResetValidator) requireUserID(pwr *pwReset) error {
