@@ -3,6 +3,7 @@ package models
 import (
 	"regexp"
 	"strings"
+	"time"
 
 	"../hash"
 	"../rand"
@@ -55,6 +56,10 @@ type UserService interface {
 	//ErrNotFound,ErrInvalidPassword ,or another error if
 	// something goes wrong.
 	Authenticate(email, password string) (*User, error)
+	// initiateReset will start  the reset password process
+	//by creating a reset  token for the use  found wich the provided email address
+	InitiateReset(email string) (string, error)
+	CompleteReset(token, newPw string) (*User, error)
 
 	UserDB
 }
@@ -64,8 +69,9 @@ func NewUserService(db *gorm.DB, pepper, hmacKye string) UserService {
 	hmac := hash.NewHMAC(hmacKye)            // кодируем хаш юзера
 	uv := newUserValidator(ug, hmac, pepper) // проверяем на соотвецтвие пользователя  и ошибки
 	return &userService{
-		UserDB: uv,
-		pepper: pepper,
+		UserDB:    uv,
+		pepper:    pepper,
+		pwResetDB: newPwReserValidator(&pwResetGorm{db}, hmac), // перезапись пароля
 	}
 }
 
@@ -73,12 +79,18 @@ var _ UserService = &userService{}
 
 type userService struct {
 	UserDB
-	pepper string
+	pepper    string
+	pwResetDB pwResetDB
 }
 
 //Authenticate  can be used to authenticate a user with the
 // provaided email address and password
-
+// If the email address provided is invalid , this will return
+//nil , ErrNotFound
+//If the password provided is invalid ,this will return nil,
+//ErrPasswordIncorrect
+// If the email and password are both valid ,this will return user, nil
+//Otherwise if another error is encountered this will return nil, error
 func (us *userService) Authenticate(email, password string) (*User, error) {
 	foundUser, err := us.ByEmail(email)
 	if err != nil {
@@ -94,6 +106,55 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 		}
 	}
 	return foundUser, err
+}
+
+func (us *userService) InitiateReset(email string) (string, error) {
+	//1. lookup user by email
+	user, err := us.ByEmail(email)
+	if err != nil {
+		return "", err
+	}
+	//2. create pwReset using user's id
+	pwr := pwReset{
+		UserID: user.ID,
+	}
+	if err := us.pwResetDB.Create(&pwr); err != nil {
+		return "", err
+	}
+	//3. Return token from pwReset
+	return pwr.Token, nil
+}
+
+func (us *userService) CompleteReset(token, newPw string) (*User, error) {
+	//1.Lookup a pwReset using the token
+	pwr, err := us.pwResetDB.ByToken(token)
+	if err != nil {
+		if err == ErrNotFaund {
+			return nil, ErrTokenInvalid
+		}
+		return nil, err
+	}
+	//2.Make sure the token is valid (not >12 hours old)
+	//2pm= 1203600
+	//1pm =1200000
+	if time.Now().Sub(pwr.CreatedAt) > (12 * time.Hour) { // Ставим типо таймера на 12 часов
+		return nil, ErrTokenInvalid
+	}
+	//3. Lookup the user by the pwReset.UserID
+	user, err := us.ByID(pwr.UserID)
+	if err != nil {
+		return nil, err
+	}
+	//4. Update the user`s  password w/ newPw
+	user.Password = newPw
+	err = us.Update(user)
+	if err != nil {
+		return nil, err
+	}
+	//5. Delete the pwReset
+	us.pwResetDB.Delete(pwr.ID)
+	//6. Return user ,nil
+	return user, nil
 }
 
 //-------------------------------------------------------------------------------

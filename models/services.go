@@ -76,7 +76,7 @@ func (s *Services) Close() error { return s.db.Close() }
 
 //DestructiveReset drops all tables and rebuilds them
 func (s *Services) DestructiveReset() error { // удалит таблицы если существует
-	err := s.db.DropTableIfExists(&User{}, &Gallery{}).Error
+	err := s.db.DropTableIfExists(&User{}, &Gallery{}, &pwReset{}).Error
 	if err != nil {
 		return err
 	}
@@ -87,5 +87,5 @@ func (s *Services) DestructiveReset() error { // удалит таблицы е�
 //AutoMigrate will attempt to autonatically migrate all tables
 //Добовляет в базу данных нехватающих полей
 func (s *Services) AutoMigrate() error {
-	return s.db.AutoMigrate(&User{}, &Gallery{}).Error
+	return s.db.AutoMigrate(&User{}, &Gallery{}, &pwReset{}).Error
 }

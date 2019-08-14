@@ -43,8 +43,8 @@ func main() {
 	must(err)
 
 	defer services.Close()
-	//services.DestructiveReset() // удаляет из бд
-	services.AutoMigrate() //записует в бд
+	services.DestructiveReset() // удаляет из бд
+	services.AutoMigrate()      //записует в бд
 
 	mgCfg := cfg.Mailgun // почтовый отправитель
 	emailer := email.NewClient(

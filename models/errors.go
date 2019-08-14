@@ -31,6 +31,9 @@ const (
 	//attempted with a user password that is less than 8 characters.
 	ErrPasswordTooShort modelError = "models: Passsword must be at least 8 characters ling"
 
+	//ErrTokenInvalid is returned when token provided is not valid
+	ErrTokenInvalid modelError = "models: token provided is not valid"
+
 	// ErrPasswordRequired is returned when an create is attempted
 	//without a user  password  provided.
 	ErrPasswordRequired modelError = "models: Passsword is required"

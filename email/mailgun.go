@@ -95,7 +95,7 @@ type Client struct {
 
 func (c *Client) Welcom(toName, toEmail string) error {
 	//1 от кого,2 Имя писма ,3 содержание , 4 кому отправлять
-	message := mailgun.NewMessage(buildEmail(toName, toEmail), welcomeSubject, welcomeText, "bipusgo@gmail.com")
+	message := mailgun.NewMessage(c.from, welcomeSubject, welcomeText, buildEmail(toName, toEmail)) //c.form заменить 4
 	//организует связывание HTML-представления вашего
 	//сообщения в дополнение к вашему текстовому сообщению.
 	message.SetHtml(welcomeHTML)

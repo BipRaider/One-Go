@@ -18,6 +18,7 @@ func parseForm(r *http.Request, dst interface{}) error {
 	return parseValues(r.PostForm, dst)
 }
 
+//parseURLParams, использует r.Form, который может быть заполнен параметрами запроса URL
 func parseURLparams(r *http.Request, dst interface{}) error {
 	if err := r.ParseForm(); err != nil {
 		return err
