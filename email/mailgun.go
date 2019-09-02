@@ -8,7 +8,9 @@ import (
 )
 
 const (
-	welcomeSubject = "Welcome to BipGo.pw" // Мема песьма
+	welcomeSubject = "Welcome to BipGo.pw" // Имя песьма
+	resetSubject   = "Instructions for resetting your password."
+	resetBaseURL   = "https://bipus.Bipgo.pw/reset" // переход на строницу востанволения пароля
 )
 
 // текст что будет появляться если сообщений было оправлено несколько
@@ -41,7 +43,7 @@ If you are asked for a token, please use the following value:
 If you didn't request a password reset you can safely ignore this email and your account will not be changed.
 
 Best,
-LensLocked Support
+BipGo Support
 `
 
 const resetHTMLTmpl = `Hi there!<br/>
@@ -57,7 +59,7 @@ If you are asked for a token, please use the following value:<br/>
 If you didn't request a password reset you can safely ignore this email and your account will not be changed.<br/>
 <br/>
 Best,<br/>
-LensLocked Support<br/>
+BipGo Support<br/>
 `
 
 // Нашь идефикатор пользователя , ключи к серевру отправителя и от акаунта
@@ -93,28 +95,24 @@ type Client struct {
 	mg   mailgun.Mailgun
 }
 
+//------------ Отправка писем
 func (c *Client) Welcom(toName, toEmail string) error {
-	//1 от кого,2 Имя писма ,3 содержание , 4 кому отправлять
-	message := mailgun.NewMessage(c.from, welcomeSubject, welcomeText, buildEmail(toName, toEmail)) //c.form заменить 4
+	//1 от кого,2 Имя письма ,3 содержание , 4 кому отправлять
+	message := mailgun.NewMessage(c.from, welcomeSubject, welcomeText, buildEmail(toName, toEmail))
 	//организует связывание HTML-представления вашего
 	//сообщения в дополнение к вашему текстовому сообщению.
 	message.SetHtml(welcomeHTML)
-	_, id, err := c.mg.Send(message)
-	fmt.Println("ID=", id)
-	return err
+	_, _, err := c.mg.Send(message)
 
+	return err
 }
 
-//https://documentation.mailgun.com/en/latest/user_manual.html#sending-via-api
-const (
-	resetSubject = "Instructions for resetting your password."
-	resetBaseURL = "https://your_adres"
-)
-
 func (c *Client) ResetPw(toEmail, token string) error {
+	//TODO: Build the reset URL
 	v := url.Values{}
 	v.Set("token", token)
 	resetUrl := resetBaseURL + "?" + v.Encode()
+
 	resetText := fmt.Sprintf(resetTextTmpl, resetUrl, token)
 	message := mailgun.NewMessage(c.from, resetSubject, resetText, toEmail)
 	resetHTML := fmt.Sprintf(resetHTMLTmpl, resetUrl, resetUrl, token)
@@ -122,6 +120,9 @@ func (c *Client) ResetPw(toEmail, token string) error {
 	_, _, err := c.mg.Send(message)
 	return err
 }
+
+//--------------
+//https://documentation.mailgun.com/en/latest/user_manual.html#sending-via-api
 
 // Функция собирающая  строку   КОМУ отправлять письмо.
 func buildEmail(name, email string) string {

@@ -48,7 +48,7 @@ func main() {
 
 	mgCfg := cfg.Mailgun // почтовый отправитель
 	emailer := email.NewClient(
-		email.WithSender("Имя Оправителя", "bipusgo@gmail.com"),           // 1 Имя отправителя ,2 Email c которого отправили
+		email.WithSender("BipGo Support", "bipusgo@gmail.com"),            // 1 Имя отправителя ,2 Email c которого отправили
 		email.WithMailgun(mgCfg.Domain, mgCfg.APIKey, mgCfg.PublicAPIKey), // прописываем ключи от отправителя почты
 	)
 	r := mux.NewRouter() //1 begin
