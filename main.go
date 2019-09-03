@@ -13,6 +13,7 @@ import (
 	"./rand"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	"golang.org/x/oauth2"
 )
 
 // var NotF *views.View
@@ -71,6 +72,32 @@ func main() {
 	requireUserMw := middleware.RequireUser{
 		User: userMw,
 	}
+	///----------------  connection DrobBox
+	dbxOAuth := &oauth2.Config{
+		ClientID:     cfg.Dropbox.ID,
+		ClientSecret: cfg.Dropbox.Secret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  cfg.Dropbox.AuthURL,
+			TokenURL: cfg.Dropbox.TokenURL,
+		},
+		// RedirectURL - это URL-адрес для перенаправления пользователей,
+		// проходящих через поток OAuth, после URL-адреса владельца ресурса.
+		RedirectURL: "http://localhost:3000/oauth/dropbox/callback",
+	}
+
+	dbxRedirect := func(w http.ResponseWriter, r *http.Request) {
+		state := csrf.Token(r) // кодировка запроса и получение токена csrf
+		url := dbxOAuth.AuthCodeURL(state)
+		fmt.Println("-------------------", state)
+		http.Redirect(w, r, url, http.StatusFound)
+	}
+	r.HandleFunc("/oauth/dropbox/connect", dbxRedirect) //заходим на Dropbox
+
+	dbxCallback := func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		fmt.Fprintln(w, " code:== ", r.FormValue("code"), " state:== ", r.FormValue("state"))
+	}
+	r.HandleFunc("/oauth/dropbox/callback", dbxCallback) // получаем ответ от Dropbox
 	///----------------
 	// NotF = views.NotFound()
 	// r.NotFoundHandler = http.HandlerFunc(notFound) //Заменили вид выводящейся ошибки на своё

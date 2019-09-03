@@ -41,12 +41,13 @@ func DefaultMysqlConfig() MysqlConfig {
 
 //---------------
 type Config struct {
-	Port     int           `json:"port"`     // Адрес сервера
-	Env      string        `json:"env"`      // для безопасности в куки
-	Pepper   string        `json:"pepper"`   // любую стрoку написать для усложнения паролей
-	HMACKey  string        `json:"hmac_key"` // любую стрoку написать для усложнения паролей
-	Database MysqlConfig   `json:"database"` // конфиг базы данных
-	Mailgun  MailgunConfig `json:"mailgun"`  // конфиг почтовой россылки
+	Port     int              `json:"port"`     // Адрес сервера
+	Env      string           `json:"env"`      // для безопасности в куки
+	Pepper   string           `json:"pepper"`   // любую стрoку написать для усложнения паролей
+	HMACKey  string           `json:"hmac_key"` // любую стрoку написать для усложнения паролей
+	Database MysqlConfig      `json:"database"` // конфиг базы данных
+	Mailgun  MailgunConfig    `json:"mailgun"`  // конфиг почтовой россылки
+	Dropbox  OAuthCredentials `json:"dropbox"`  // конфиг dropbox
 }
 
 // для вывода значения False
@@ -70,6 +71,14 @@ type MailgunConfig struct {
 	APIKey       string `json:"api_key"`
 	PublicAPIKey string `json:"public_api_key"`
 	Domain       string `json:"domain"`
+}
+
+//the DropBox key and url
+type OAuthCredentials struct {
+	ID       string `json:"id"`
+	Secret   string `json:"secret"`
+	AuthURL  string `json:"auth_url"`
+	TokenURL string `json:"token_url"`
 }
 
 // Приобразуем данные  из конфига с  помощью JSON для отправки данных на сервер для запуска БД
