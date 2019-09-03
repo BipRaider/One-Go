@@ -28,7 +28,7 @@ func (c MysqlConfig) ConnectionInf() string {
 	return fmt.Sprintf("%s%s%s%s%s", c.Username, c.Password, c.DS, c.DBName, c.Decoder)
 }
 
-// Данные для в соединения с базой данных
+// DefaultMysqlConfig -Данные для в соединения с базой данных
 func DefaultMysqlConfig() MysqlConfig {
 	return MysqlConfig{
 		Username: "root:",    //имя в MySql
@@ -39,7 +39,7 @@ func DefaultMysqlConfig() MysqlConfig {
 	}
 }
 
-//---------------
+//Config ---------------
 type Config struct {
 	Port     int              `json:"port"`     // Адрес сервера
 	Env      string           `json:"env"`      // для безопасности в куки
@@ -55,6 +55,7 @@ func (c Config) isProd() bool {
 	return c.Env == "prod" // выдаёт false
 }
 
+//DefaultConfig the config default value
 func DefaultConfig() Config {
 	return Config{
 		Port:     3000,                   // локальный порт проэкта
@@ -66,7 +67,7 @@ func DefaultConfig() Config {
 	}
 }
 
-//The key and login for  Mailgun
+//MailgunConfig - the key and login for  Mailgun
 type MailgunConfig struct {
 	APIKey       string `json:"api_key"`
 	PublicAPIKey string `json:"public_api_key"`

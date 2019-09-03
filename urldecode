@@ -1,5 +1,0 @@
-https://www.dropbox.com/oauth2/authorize?
-client_id=9uu70qrsqysve1y
-&redirect_uri=http://localhost:3000/oauth/dropbox/callback
-&response_type=code
-&state=Mf7JIQDXwuFPZ1wUpDNtxXgN+aSDgKkehGRiSC0m9Xezgr3xneYvav+tACf1+/DQs0xQ26dgbPGt9B1t+1fabg==

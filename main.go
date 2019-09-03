@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"./controllers"
 	"./email"
@@ -87,15 +89,41 @@ func main() {
 
 	dbxRedirect := func(w http.ResponseWriter, r *http.Request) {
 		state := csrf.Token(r) // кодировка запроса и получение токена csrf
+		//вносим новые данные в куки
+		cookie := http.Cookie{
+			Name:     "oauth_state",
+			Value:    state,
+			HttpOnly: true,
+		}
+		http.SetCookie(w, &cookie) //Устанавливаем куку
 		url := dbxOAuth.AuthCodeURL(state)
-		fmt.Println("-------------------", state)
 		http.Redirect(w, r, url, http.StatusFound)
 	}
 	r.HandleFunc("/oauth/dropbox/connect", dbxRedirect) //заходим на Dropbox
 
 	dbxCallback := func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
-		fmt.Fprintln(w, " code:== ", r.FormValue("code"), " state:== ", r.FormValue("state"))
+		state := r.FormValue("state")          // получаем данные URL состояния(state)key is from url
+		cookie, err := r.Cookie("oauth_state") // Получавем данные из куки
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		} else if cookie == nil || cookie.Value != state {
+			http.Error(w, "Invalid state provided", http.StatusBadRequest)
+			return
+		}
+		code := r.FormValue("code")
+		cookie.Value = ""           // устанавливаем значенеи куки пустую строку
+		cookie.Expires = time.Now() // время замены куки в данный момент
+		http.SetCookie(w, cookie)   // заменяем куку изменёными файлами
+
+		token, err := dbxOAuth.Exchange(context.TODO(), code)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		fmt.Fprintf(w, "%+v", token) // выводим в браузере на страницу
+		fmt.Fprintln(w, " code:== ", r.FormValue("code"))
 	}
 	r.HandleFunc("/oauth/dropbox/callback", dbxCallback) // получаем ответ от Dropbox
 	///----------------

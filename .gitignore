@@ -61,7 +61,7 @@ builds/**/images/*
 # Don't include our binary
 One-Go
 images/**
-
+scripts/**
 .config
 notes/**
 .vscode/**
