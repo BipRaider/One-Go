@@ -42,12 +42,19 @@ func main() {
 		models.WithUser(cfg.Pepper, cfg.HMACKey),
 		models.WithGallery(),
 		models.WithImage(),
+		models.WithOAuth(),
 	)
 	must(err)
 
 	defer services.Close()
 	//services.DestructiveReset() // удаляет из бд
 	services.AutoMigrate() //записует в бд
+	_, err = services.OAuth.Find(1, "dropbox")
+	if err == nil {
+		panic("expected ErrNotFound")
+	} else {
+		fmt.Println("No OAuth tokens found")
+	}
 
 	mgCfg := cfg.Mailgun // почтовый отправитель
 	emailer := email.NewClient(

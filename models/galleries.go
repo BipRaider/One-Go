@@ -106,6 +106,7 @@ func (gv *galleryValidator) Delete(id uint) error {
 	return gv.GalleryDB.Delete(id)
 }
 
+//-----------------------------------------------------
 //проверка на  соотвецтвие   необходимого id пользователя
 func (gv *galleryValidator) userIDRequired(g *Gallery) error {
 	if g.UserID <= 0 {

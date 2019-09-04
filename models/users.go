@@ -21,7 +21,7 @@ type User struct {
 	Password     string `gorm:"-"`
 	PasswordHash string `gorm:"not null"`
 	Remember     string `gorm:"-"`
-	RememberHash string `gorm:"not null;unigue_index"`
+	RememberHash string `gorm:"not null;unique_index"`
 }
 
 //UserDB is used to interact with the users database

@@ -11,7 +11,7 @@ type ServicesConfig func(*Services) error
 //Соединяемся с базой данных
 func WithGorm(dialect, connectionInfo string) ServicesConfig {
 	return func(s *Services) error {
-		//Соединение с базой данных  !!ВАЖНО ?charset=utf8&parseTime=True&loc=Local  добисывать в конце если надо чтобы выводило время
+		//Соединение с базой данных  !!ВАЖНО ?charset=utf8&parseTime=True&loc=Local  дописывать в конце если надо чтобы выводило время
 		db, err := gorm.Open(dialect, connectionInfo) //"root:password@/NameDB?charset=utf8&parseTime=True&loc=Local"
 		if err != nil {
 			return err
@@ -53,6 +53,14 @@ func WithImage() ServicesConfig {
 	}
 }
 
+//Запускаем соединения с DropBox
+func WithOAuth() ServicesConfig {
+	return func(s *Services) error {
+		s.OAuth = NewOAuthService(s.db)
+		return nil
+	}
+}
+
 //Запуск функций  которые запускают Бд, Проверку на кодироания , запускают галерей и просмотр картинок
 func NewServices(cfgs ...ServicesConfig) (*Services, error) {
 	var s Services
@@ -68,6 +76,7 @@ type Services struct {
 	Gallery GalleryService
 	User    UserService
 	Image   ImageService
+	OAuth   OAuthService
 	db      *gorm.DB
 }
 
@@ -76,7 +85,7 @@ func (s *Services) Close() error { return s.db.Close() }
 
 //DestructiveReset drops all tables and rebuilds them
 func (s *Services) DestructiveReset() error { // удалит таблицы если существует
-	err := s.db.DropTableIfExists(&User{}, &Gallery{}, &pwReset{}).Error
+	err := s.db.DropTableIfExists(&User{}, &Gallery{}, &OAuth{}, &pwReset{}).Error
 	if err != nil {
 		return err
 	}
@@ -85,7 +94,7 @@ func (s *Services) DestructiveReset() error { // удалит таблицы е�
 }
 
 //AutoMigrate will attempt to autonatically migrate all tables
-//Добовляет в базу данных нехватающих полей
+//Добовляет в базу данных нехватающих полей и заносит данные в базу данных
 func (s *Services) AutoMigrate() error {
-	return s.db.AutoMigrate(&User{}, &Gallery{}, &pwReset{}).Error
+	return s.db.AutoMigrate(&User{}, &Gallery{}, &OAuth{}, &pwReset{}).Error
 }

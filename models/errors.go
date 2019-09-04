@@ -5,13 +5,13 @@ import (
 )
 
 const (
-	//ErrNorFound is returned when a resource cannot be found
+	//ErrNotFound is returned when a resource cannot be found
 	// in the database.
 	ErrNotFaund modelError = "models: resource not found"
-
+	//ErrInvalidEmail is returned when an invalid email addres
 	ErrInvalidEmail modelError = "models: invalid email address provided"
 
-	// ErrInvalidPassword is returned when an invalid password
+	//ErrPasswordInCorrect is returned when an invalid password
 	//is used when attempting to authenticate a user.
 	ErrPasswordInCorrect modelError = "models: invalid password provided"
 
@@ -41,7 +41,7 @@ const (
 	//ErrTitleRequired is returned when
 	ErrTitleRequired modelError = "models: Title is required"
 
-	//ErrInvalidI is returned when  an invalid ID is provided
+	//ErrInvalidID is returned when  an invalid ID is provided
 	// to a mathod like Delete.
 	ErrInvalidID privateError = "models: ID provided was invalid, must be > 0"
 
@@ -55,6 +55,9 @@ const (
 
 	//ErrUserIDRequired  is returned when
 	ErrUserIDRequired privateError = "models: User ID is required"
+
+	//ErrServiceRequired is returned when
+	ErrServiceRequired privateError = "models: Service is required"
 )
 
 type modelError string
